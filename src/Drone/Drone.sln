@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drone", "Drone\Drone.csproj", "{0A9E1303-6AB8-4A7B-A442-EBD52CE460B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drone.Tests", "Drone.Tests\Drone.Tests.csproj", "{4308D74B-7ED8-4B04-A6F3-B57B6F349FD2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drone.App", "Drone.App\Drone.App.csproj", "{1C69434C-2340-4080-A955-F67B165B07EF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0A9E1303-6AB8-4A7B-A442-EBD52CE460B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A9E1303-6AB8-4A7B-A442-EBD52CE460B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A9E1303-6AB8-4A7B-A442-EBD52CE460B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A9E1303-6AB8-4A7B-A442-EBD52CE460B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4308D74B-7ED8-4B04-A6F3-B57B6F349FD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4308D74B-7ED8-4B04-A6F3-B57B6F349FD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4308D74B-7ED8-4B04-A6F3-B57B6F349FD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4308D74B-7ED8-4B04-A6F3-B57B6F349FD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C69434C-2340-4080-A955-F67B165B07EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C69434C-2340-4080-A955-F67B165B07EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C69434C-2340-4080-A955-F67B165B07EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C69434C-2340-4080-A955-F67B165B07EF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
