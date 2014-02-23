@@ -7,8 +7,8 @@
     <ProjectGuid>{0A9E1303-6AB8-4A7B-A442-EBD52CE460B9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Drone</RootNamespace>
-    <AssemblyName>Drone</AssemblyName>
+    <RootNamespace>Drone.API</RootNamespace>
+    <AssemblyName>Drone.API</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -44,10 +44,14 @@
   <ItemGroup>
     <Compile Include="Core\DroneMainModuleFinder.cs" />
     <Compile Include="Core\DroneRunner.cs" />
+    <Compile Include="Core\DroneRunnerResult.cs" />
+    <Compile Include="Core\DroneTasksNotFoundException.cs" />
+    <Compile Include="Core\HumanFriendlyTime.cs" />
     <Compile Include="Helpers\DictionaryExtensions.cs" />
     <Compile Include="DroneTask.cs" />
     <Compile Include="DroneContext.cs" />
     <Compile Include="DroneModule.cs" />
+    <Compile Include="Helpers\ExceptionExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Drone.Helpers
+namespace Drone.API.Helpers
 {
 	public static class DictionaryExtensions
 	{

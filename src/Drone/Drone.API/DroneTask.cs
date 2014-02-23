@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Drone
+namespace Drone.API
 {
 	public class DroneTask
 	{

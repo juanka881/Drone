@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Drone.Helpers;
+using Drone.API.Helpers;
 
-namespace Drone
+namespace Drone.API
 {
 	public class DroneModule
 	{
+		public static readonly string DefaultTaskName = "default";
+
 		private readonly IDictionary<string, DroneTask> tasks;
 
 		public IEnumerable<DroneTask> Tasks
