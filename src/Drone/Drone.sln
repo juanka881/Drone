@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drone.Tests", "Drone.Tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drone.App", "Drone.App\Drone.App.csproj", "{1C69434C-2340-4080-A955-F67B165B07EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drone.API", "Drone.API\Drone.API.csproj", "{0A9E1303-6AB8-4A7B-A442-EBD52CE460B9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drone.Lib", "Drone.Lib\Drone.Lib.csproj", "{0A9E1303-6AB8-4A7B-A442-EBD52CE460B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

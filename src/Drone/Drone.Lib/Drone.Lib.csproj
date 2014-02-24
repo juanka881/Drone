@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0A9E1303-6AB8-4A7B-A442-EBD52CE460B9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Drone.Lib</RootNamespace>
+    <AssemblyName>Drone.Lib</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\..\..\packages\Autofac.3.3.0\lib\net40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="ConsoleAppLauncher">
+      <HintPath>..\..\..\packages\ConsoleAppLauncher.1.0.4838.20605\lib\net40\ConsoleAppLauncher.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=2.1.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\NLog.2.1.0\lib\net45\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Compilers\CSharpCompiler.cs" />
+    <Compile Include="Compilers\CSharpCompilerArgs.cs" />
+    <Compile Include="Compilers\CSharpCompilerResult.cs" />
+    <Compile Include="Compilers\DotNetFramework.cs" />
+    <Compile Include="DroneLogs.cs" />
+    <Compile Include="DroneTask.cs" />
+    <Compile Include="DroneContext.cs" />
+    <Compile Include="DroneModule.cs" />
+    <Compile Include="Compilers\DronefileCompiler.cs" />
+    <Compile Include="Compilers\DronefileCompilerResult.cs" />
+    <Compile Include="Exceptions\RequestHandlerParameterCastException.cs" />
+    <Compile Include="Exceptions\RequestHandlerNotFoundException.cs" />
+    <Compile Include="Exceptions\RequestParserNotFoundException.cs" />
+    <Compile Include="Helpers\ListExtensions.cs" />
+    <Compile Include="Helpers\ObjectExtensions.cs" />
+    <Compile Include="Helpers\PathHelper.cs" />
+    <Compile Include="Repo\Dronefile.cs" />
+    <Compile Include="Engine\DroneMainModuleFinder.cs" />
+    <Compile Include="Exceptions\MainModuleNotFoundException.cs" />
+    <Compile Include="Engine\DroneTaskRunner.cs" />
+    <Compile Include="Engine\DroneTaskRunnerResult.cs" />
+    <Compile Include="Exceptions\TasksNotFoundException.cs" />
+    <Compile Include="Exceptions\TooManyMainModulesFoundException.cs" />
+    <Compile Include="Repo\DronefileData.cs" />
+    <Compile Include="Repo\DronefileExtensions.cs" />
+    <Compile Include="Repo\DronefileRepo.cs" />
+    <Compile Include="Repo\DronefileRepoExtensions.cs" />
+    <Compile Include="Helpers\DictionaryExtensions.cs" />
+    <Compile Include="Helpers\ExceptionExtensions.cs" />
+    <Compile Include="Helpers\HumanFriendlyTime.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestModules\IDronefileRepoAware.cs" />
+    <Compile Include="RequestModules\ILoggerAware.cs" />
+    <Compile Include="RequestModules\RequestHandler.cs" />
+    <Compile Include="RequestModules\IRequestHandler.cs" />
+    <Compile Include="RequestModules\IRequestParser.cs" />
+    <Compile Include="RequestModules\FileModule\AddParameter.cs" />
+    <Compile Include="RequestModules\FileModule\AddHandler.cs" />
+    <Compile Include="RequestModules\FileModule\NewParameter.cs" />
+    <Compile Include="RequestModules\FileModule\NewHandler.cs" />
+    <Compile Include="RequestModules\FileModule\FileRequestParser.cs" />
+    <Compile Include="RequestModules\FileModule\RemoveParameter.cs" />
+    <Compile Include="RequestModules\FileModule\RemoveHandler.cs" />
+    <Compile Include="RequestModules\RequestParameter.cs" />
+    <Compile Include="RequestModules\RequestTokenizer.cs" />
+    <Compile Include="RequestModules\RunModule\RunParameter.cs" />
+    <Compile Include="RequestModules\RunModule\RunRequestHandler.cs" />
+    <Compile Include="RequestModules\RunModule\RunRequestParser.cs" />
+    <Compile Include="RequestModules\DroneRequestRunner.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Drone.API.Helpers
+namespace Drone.Lib.Helpers
 {
 	public static class ExceptionExtensions
 	{

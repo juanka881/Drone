@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Drone.API.Core
+namespace Drone.Lib.Helpers
 {
 	public class HumanFriendlyTime
 	{

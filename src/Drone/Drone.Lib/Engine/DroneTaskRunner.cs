@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Drone.API.Helpers;
+using Drone.Lib.Exceptions;
+using Drone.Lib.Helpers;
 using NLog;
 using System.IO;
 
-namespace Drone.API.Core
+namespace Drone.Lib.Engine
 {
-	public class DroneRunner
+	public class DroneTaskRunner
 	{
 		private void CheckTaskNames(DroneModule module, IList<string> taskNames)
 		{
@@ -19,10 +20,10 @@ namespace Drone.API.Core
 						.ToList();
 
 			if (tasksNotFound.Count > 0)
-				throw DroneTasksNotFoundException.Get(tasksNotFound);
+				throw TasksNotFoundException.Get(tasksNotFound);
 		}
 
-		public DroneRunnerResult Run(DroneModule module, IEnumerable<string> taskNames)
+		public DroneTaskRunnerResult Run(DroneModule module, IEnumerable<string> taskNames)
 		{
 			if (module == null)
 				throw new ArgumentNullException("module");
@@ -30,7 +31,7 @@ namespace Drone.API.Core
 			if (taskNames == null)
 				throw new ArgumentNullException("taskNames");
 
-			var log = LogManager.GetLogger("drone");
+			var log = LogManager.GetLogger(DroneLogs.LogName);
 			
 			var sw = new Stopwatch();
 
@@ -63,7 +64,7 @@ namespace Drone.API.Core
 
 				sw.Stop();
 
-				return DroneRunnerResult.Success;
+				return DroneTaskRunnerResult.Success;
 			}
 			catch (Exception ex)
 			{
@@ -93,7 +94,7 @@ namespace Drone.API.Core
 				log.Info(string.Empty);
 				log.Info("total time: {0}", HumanFriendlyTime.Get(sw.Elapsed));
 
-				return new DroneRunnerResult(ex);
+				return new DroneTaskRunnerResult(ex);
 			}
 		}
 
@@ -117,7 +118,7 @@ namespace Drone.API.Core
 
 			try
 			{
-				var taskLog = LogManager.GetLogger(string.Format("drone.task.{0}", task.Name));
+				var taskLog = LogManager.GetLogger(string.Format("{0}.{1}", DroneLogs.TaskLogName, task.Name));
 				var context = new DroneContext(task.Name, taskLog);
 
 				log.Info("running '{0}'", task.Name);

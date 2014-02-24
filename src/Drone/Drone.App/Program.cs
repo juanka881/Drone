@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Drone.API;
-using Drone.API.Core;
+using Drone.Lib;
+using Drone.Lib.Engine;
+using Drone.Lib.RequestModules;
 
 namespace Drone.App
 {
@@ -11,8 +13,13 @@ namespace Drone.App
 	{
 		static void Main(string[] args)
 		{
-			var runner = new DroneRunner();
-			runner.Run(new Dronefile(), args);
+			if (args.Any(x => !string.IsNullOrEmpty(x) && x.Contains("-d")))
+			{
+				while (!Debugger.IsAttached) { }
+			}
+
+			var runner = new DroneRequestRunner();
+			runner.Run(Environment.CommandLine);
 		}
 	}
 
@@ -24,9 +31,9 @@ namespace Drone.App
 		}
 	}
 
-	public class Dronefile : DroneModule
+	public class Dronemain : DroneModule
 	{
-		public Dronefile()
+		public Dronemain()
 		{
 			this.Register("main", c =>
 			{
