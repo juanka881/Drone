@@ -49,7 +49,7 @@ namespace Drone.Lib.CommandHandlers
 		private string GetFlag(CommandTokens tokens, string flag, string def)
 		{
 			var config = (from flagToken in tokens
-						  where flagToken.Value == "-f"
+						  where flagToken.Value == flag
 						  let valueToken = tokens.GetAt(flagToken.Key + 1)
 						  where valueToken.Key != -1
 						  select new
