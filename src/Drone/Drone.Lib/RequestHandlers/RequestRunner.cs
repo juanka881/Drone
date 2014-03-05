@@ -24,13 +24,17 @@ namespace Drone.Lib.RequestHandlers
 		private RequestTokens GetRequestTokens(string requestString)
 		{
 			var tokenizer = new StringTokenizer();
-			var tokens = tokenizer.GetTokens(requestString).Skip(1);
+			var tokens = tokenizer.GetTokens(requestString);
 			return new RequestTokens(tokens);
 		}
 
 		private RequestHandler GetRequestHandler(RequestTokens tokens)
 		{
 			var request = tokens.Pop();
+
+			if (request == "drone")
+				request = tokens.Pop();
+
 			var handler = null as object;
 
 			if (string.IsNullOrWhiteSpace(request))
@@ -56,8 +60,6 @@ namespace Drone.Lib.RequestHandlers
 
 			if (config != null)
 			{
-				tokens.RemoveAt(config.flagToken.Key);
-				tokens.RemoveAt(config.valueToken.Key);
 				return config.valueToken.Value;
 			}
 			else
@@ -74,9 +76,7 @@ namespace Drone.Lib.RequestHandlers
 			handler.Log = this.log;
 			handler.Repo = this.container.Resolve<DroneConfigRepo>();
 
-			var configFilepath = this.GetFlag(tokens, "-f", DroneConfig.DefaultFilename);
-
-			handler.DroneConfigFilepath = configFilepath;
+			handler.Flags.Filename = this.GetFlag(tokens, "-f", DroneConfig.DefaultFilename);
 
 			try
 			{

@@ -19,12 +19,12 @@ namespace Drone.Lib.Configs
 			}
 		}
 
-		public static void Save(this DroneConfigRepo repo, DroneConfig droneConfig, string filepath)
+		public static void Save(this DroneConfigRepo repo, DroneConfig droneConfig)
 		{
 			if (repo == null)
 				throw new ArgumentNullException("repo");
 
-			using (var fs = File.Open(filepath, FileMode.Create, FileAccess.Write))
+			using (var fs = File.Open(droneConfig.FilePath, FileMode.Create, FileAccess.Write))
 			{
 				repo.Save(droneConfig, fs);
 			}

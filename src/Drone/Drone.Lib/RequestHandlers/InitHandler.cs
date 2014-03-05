@@ -12,16 +12,21 @@ namespace Drone.Lib.RequestHandlers
 	{
 		public override void Handle(RequestTokens tokens)
 		{
-			if (File.Exists(this.DroneConfigFilepath))
+			if (File.Exists(this.Flags.Filename))
 				return;
 
 			var currentDir = Directory.GetCurrentDirectory();
-			var filepath = Path.Combine(currentDir, this.DroneConfigFilepath);
+
+			var filepath = this.Flags.Filename;
+
+			if(!Path.IsPathRooted(filepath))
+				filepath = Path.Combine(currentDir, filepath);
+
 			var buildDir = DroneConfig.DefaultBuildDir;
 
-			var dronefile = new DroneConfig(filepath, buildDir);
+			var droneConfig = new DroneConfig(filepath, buildDir);
 
-			this.Repo.Save(dronefile, filepath);
+			this.Repo.Save(droneConfig);
 		}
 	}
 }

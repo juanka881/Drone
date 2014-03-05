@@ -13,8 +13,13 @@ namespace Drone.Lib.Core
 
 		public DroneConfigRepo Repo { get; set; }
 
-		public string DroneConfigFilepath { get; set; }
+		public DroneFlags Flags { get; set; }
 
 		public abstract void Handle(RequestTokens tokens);
+
+		protected RequestHandler()
+		{
+			this.Flags = new DroneFlags();
+		}
 	}
 }

@@ -37,12 +37,13 @@ namespace Drone.Lib.Core
 
 		public void RemoveAt(int i)
 		{
-			this.tokens.RemoveAt(i);
+			if(i > 0 && i < this.tokens.Count)
+				this.tokens.RemoveAt(i);
 		}
 
 		public KeyValuePair<int, string> GetAt(int i)
 		{
-			if (i > 0 && i < this.tokens.Count - 1)
+			if (i > 0 && i < this.tokens.Count)
 				return new KeyValuePair<int, string>(i, this.tokens[i]);
 			else
 				return new KeyValuePair<int, string>(-1, string.Empty);

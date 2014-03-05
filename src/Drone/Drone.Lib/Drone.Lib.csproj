@@ -85,6 +85,7 @@
     <Compile Include="Core\RequestHandler.cs" />
     <Compile Include="RequestHandlers\AddHandler.cs" />
     <Compile Include="RequestHandlers\CompilerHandler.cs" />
+    <Compile Include="Core\DroneFlags.cs" />
     <Compile Include="RequestHandlers\ExplainHandler.cs" />
     <Compile Include="RequestHandlers\HelpHandler.cs" />
     <Compile Include="RequestHandlers\InitHandler.cs" />
