@@ -4,13 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Drone.Lib.Repo
+namespace Drone.Lib.Configs
 {
-	public class Dronefile
+	public class DroneConfig
 	{
-		public static readonly string DefaultFilename = "dronefile.json";
+		public static readonly string DefaultFilename = "drone.config";
 
-		public static readonly string DefaultBuildDir = "drone.build";
+		public static readonly string DefaultBuildDir = "drone.bin";
 
 		public string FilePath { get; private set; }
 
@@ -20,17 +20,19 @@ namespace Drone.Lib.Repo
 
 		public string BuildDir { get; private set; }
 
+		public string BuildPath { get; private set; }
+
 		public IList<string> SourceFiles { get; private set; }
 
 		public IList<string> ReferenceFiles { get; private set; }
 
-		public Dronefile(string filepath, string buildDir) : 
+		public DroneConfig(string filepath, string buildDir) : 
 			this(filepath, buildDir, Enumerable.Empty<string>(), Enumerable.Empty<string>())
 		{
 			
 		}
 
-		public Dronefile(string filepath, string buildDir, IEnumerable<string> sourceFiles, IEnumerable<string> referenceFiles)
+		public DroneConfig(string filepath, string buildDir, IEnumerable<string> sourceFiles, IEnumerable<string> referenceFiles)
 		{
 			if (string.IsNullOrWhiteSpace(filepath))
 				throw new ArgumentException("filepath is empty. filepath is expected to have a non-empty string value");
@@ -48,6 +50,7 @@ namespace Drone.Lib.Repo
 			this.FileName = Path.GetFileName(this.FilePath);
 			this.FileDir = Path.GetDirectoryName(this.FilePath);
 			this.BuildDir = buildDir;
+			this.BuildPath = Path.Combine(this.FileDir, buildDir);
 			this.SourceFiles = new List<string>(sourceFiles);
 			this.ReferenceFiles = new List<string>(referenceFiles);
 		}

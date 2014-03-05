@@ -27,11 +27,11 @@ namespace Drone.Lib.Exceptions
 		{
 		}
 
-		public static RequestHandlerNotFoundException Get(object parameter)
+		public static RequestHandlerNotFoundException Get(string request)
 		{
-			var ex = new RequestHandlerNotFoundException("Unable to get handler for parameter");
+			var ex = new RequestHandlerNotFoundException("Unable to get handler for request");
 
-			ex.Data["parameter"] = parameter != null ? parameter.ToString() : string.Empty;
+			ex.Data["request"] = request ?? string.Empty;
 			
 			return ex;
 		}

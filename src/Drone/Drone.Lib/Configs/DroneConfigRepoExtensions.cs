@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Drone.Lib.Repo
+namespace Drone.Lib.Configs
 {
-	public static class DronefileRepoExtensions
+	public static class DroneConfigRepoExtensions
 	{
-		public static Dronefile Load(this DronefileRepo repo, string filepath)
+		public static DroneConfig Load(this DroneConfigRepo repo, string filepath)
 		{
 			if (repo == null)
 				throw new ArgumentNullException("repo");
@@ -19,14 +19,14 @@ namespace Drone.Lib.Repo
 			}
 		}
 
-		public static void Save(this DronefileRepo repo, Dronefile dronefile, string filepath)
+		public static void Save(this DroneConfigRepo repo, DroneConfig droneConfig, string filepath)
 		{
 			if (repo == null)
 				throw new ArgumentNullException("repo");
 
 			using (var fs = File.Open(filepath, FileMode.Create, FileAccess.Write))
 			{
-				repo.Save(dronefile, fs);
+				repo.Save(droneConfig, fs);
 			}
 		}
 	}

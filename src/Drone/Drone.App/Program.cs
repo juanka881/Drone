@@ -4,8 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Drone.Lib;
-using Drone.Lib.Engine;
-using Drone.Lib.RequestModules;
+using Drone.Lib.RequestHandlers;
 
 namespace Drone.App
 {
@@ -13,12 +12,12 @@ namespace Drone.App
 	{
 		static void Main(string[] args)
 		{
-			if (args.Any(x => !string.IsNullOrEmpty(x) && x.Contains("-d")))
+			if (args.Any(x => x == "-d"))
 			{
 				while (!Debugger.IsAttached) { }
 			}
 
-			var runner = new DroneRequestRunner();
+			var runner = new RequestRunner();
 			runner.Run(Environment.CommandLine);
 		}
 	}

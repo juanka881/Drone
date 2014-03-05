@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Drone.Lib.Engine
+namespace Drone.Lib.Core
 {
-	public class DroneTaskRunnerResult
+	public class TaskRunnerResult
 	{
-		public static readonly DroneTaskRunnerResult Success = new DroneTaskRunnerResult(null);
+		public static readonly TaskRunnerResult Success = new TaskRunnerResult(null);
 
-		public DroneTaskRunnerResult(Exception ex)
+		public TaskRunnerResult(Exception ex)
 		{
 			this.Exception = ex;
 		}

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Drone.Lib.Repo
+namespace Drone.Lib.Configs
 {
-	public class DronefileData
+	public class DroneConfigData
 	{
 		[JsonProperty("build-dir")]
 		public string BuildDir { get; set; }
@@ -17,7 +17,7 @@ namespace Drone.Lib.Repo
 		[JsonProperty("reference-files")]
 		public IList<string> ReferenceFiles { get; set; }
 
-		public DronefileData()
+		public DroneConfigData()
 		{
 			this.SourceFiles = new List<string>();
 			this.ReferenceFiles = new List<string>();

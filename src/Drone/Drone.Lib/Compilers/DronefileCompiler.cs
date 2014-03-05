@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Drone.Lib.Repo;
+using Drone.Lib.Configs;
 
 namespace Drone.Lib.Compilers
 {
 	public class DronefileCompiler
 	{
-		public DronefileCompilerResult Compile(Dronefile dronefile)
+		public DronefileCompilerResult Compile(DroneConfig droneConfig)
 		{
-			var filename = Path.GetFileNameWithoutExtension(dronefile.FileName);
+			var filename = Path.GetFileNameWithoutExtension(droneConfig.FileName);
 			var outputFilename = string.Format("{0}.dll", filename);
-			var outputFilepath = Path.Combine(dronefile.BuildDir, outputFilename);
-			var workDir = dronefile.FileDir;
+			var outputFilepath = Path.Combine(droneConfig.BuildDir, outputFilename);
+			var workDir = droneConfig.FileDir;
 
-			if (!Directory.Exists(dronefile.BuildDir))
-				Directory.CreateDirectory(dronefile.BuildDir);
+			if (!Directory.Exists(droneConfig.BuildDir))
+				Directory.CreateDirectory(droneConfig.BuildDir);
 
 			var args = new CSharpCompilerArgs(workDir, 
 				outputFilepath, 
-				dronefile.SourceFiles, 
-				dronefile.ReferenceFiles);
+				droneConfig.SourceFiles, 
+				droneConfig.ReferenceFiles);
 
 			var csc = new CSharpCompiler();
 			var cscResult = csc.Compile(args);

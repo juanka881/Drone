@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Drone.Lib.Exceptions;
 
-namespace Drone.Lib.Engine
+namespace Drone.Lib.Core
 {
-	public class DroneMainModuleFinder
+	public class MainModuleFinder
 	{
-		public DroneModule Find()
+		public DroneModule Find(Assembly assembly)
 		{
-			var moduleTypes = (from asm in AppDomain.CurrentDomain.GetAssemblies()
-							   from type in asm.GetTypes()
+			if (assembly == null)
+				throw new ArgumentNullException("assembly");
+
+			var moduleTypes = (from type in assembly.GetTypes()
 							   where typeof (DroneModule).IsAssignableFrom(type) &&
 									 type.Name.ToLower() == DroneModule.MainModuleName
 							   select type).ToList();

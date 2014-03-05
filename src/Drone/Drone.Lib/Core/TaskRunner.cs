@@ -1,29 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Drone.Lib.Exceptions;
 using Drone.Lib.Helpers;
 using NLog;
-using System.IO;
 
-namespace Drone.Lib.Engine
+namespace Drone.Lib.Core
 {
-	public class DroneTaskRunner
+	public class TaskRunner
 	{
-		private void CheckTaskNames(DroneModule module, IList<string> taskNames)
-		{
-			var tasksNotFound = taskNames
-						.Where(x => module.TryGetTask(x) == null)
-						.Distinct()
-						.ToList();
-
-			if (tasksNotFound.Count > 0)
-				throw TasksNotFoundException.Get(tasksNotFound);
-		}
-
-		public DroneTaskRunnerResult Run(DroneModule module, IEnumerable<string> taskNames)
+		public TaskRunnerResult Run(DroneModule module, IEnumerable<string> taskNames)
 		{
 			if (module == null)
 				throw new ArgumentNullException("module");
@@ -31,7 +20,7 @@ namespace Drone.Lib.Engine
 			if (taskNames == null)
 				throw new ArgumentNullException("taskNames");
 
-			var log = LogManager.GetLogger(DroneLogs.LogName);
+			var log = LogManager.GetLogger(Logging.LogName);
 			
 			var sw = new Stopwatch();
 
@@ -64,7 +53,7 @@ namespace Drone.Lib.Engine
 
 				sw.Stop();
 
-				return DroneTaskRunnerResult.Success;
+				return TaskRunnerResult.Success;
 			}
 			catch (Exception ex)
 			{
@@ -94,8 +83,19 @@ namespace Drone.Lib.Engine
 				log.Info(string.Empty);
 				log.Info("total time: {0}", HumanFriendlyTime.Get(sw.Elapsed));
 
-				return new DroneTaskRunnerResult(ex);
+				return new TaskRunnerResult(ex);
 			}
+		}
+
+		private void CheckTaskNames(DroneModule module, IList<string> taskNames)
+		{
+			var tasksNotFound = taskNames
+						.Where(x => module.TryGetTask(x) == null)
+						.Distinct()
+						.ToList();
+
+			if (tasksNotFound.Count > 0)
+				throw TasksNotFoundException.Get(tasksNotFound);
 		}
 
 		private void RunDefaultTaskIfAny(DroneModule module, Logger log)
@@ -118,7 +118,7 @@ namespace Drone.Lib.Engine
 
 			try
 			{
-				var taskLog = LogManager.GetLogger(string.Format("{0}.{1}", DroneLogs.TaskLogName, task.Name));
+				var taskLog = LogManager.GetLogger(string.Format("{0}.{1}", Logging.TaskLogBaseName, task.Name));
 				var context = new DroneContext(task.Name, taskLog);
 
 				log.Info("running '{0}'", task.Name);
@@ -139,6 +139,5 @@ namespace Drone.Lib.Engine
 				throw;
 			}
 		}
-
 	}
 }
