@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Drone.Lib.Core;
 
-namespace Drone.Lib.RequestHandlers
+namespace Drone.Lib.CommandHandlers
 {
-	public class HelpHandler : RequestHandler
+	public class HelpHandler : CommandHandler
 	{
-		public override void Handle(RequestTokens tokens)
+		public override void Handle(CommandTokens tokens)
 		{
 			this.Log.Info("!help goes here");
 		}

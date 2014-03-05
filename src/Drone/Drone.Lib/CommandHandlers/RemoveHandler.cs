@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using Drone.Lib.Core;
 
-namespace Drone.Lib.RequestHandlers
+namespace Drone.Lib.CommandHandlers
 {
-	public class RemoveHandler : RequestHandler
+	public class RemoveHandler : CommandHandler
 	{
-		public override void Handle(RequestTokens tokens)
+		public override void Handle(CommandTokens tokens)
 		{
 			//var sourceFiles = p.Files.Where(x => x.EndsWith(".cs")).ToList();
 			//var referenceFiles = p.Files.Where(x => x.EndsWith(".dll")).ToList();

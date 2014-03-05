@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Drone.Lib;
-using Drone.Lib.RequestHandlers;
+using Drone.Lib.CommandHandlers;
 
 namespace Drone.App
 {
@@ -17,7 +17,7 @@ namespace Drone.App
 				while (!Debugger.IsAttached) { }
 			}
 
-			var runner = new RequestRunner();
+			var runner = new CommandRunner();
 			runner.Run(Environment.CommandLine);
 		}
 	}

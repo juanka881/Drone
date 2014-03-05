@@ -6,11 +6,11 @@ using System.Text;
 using Drone.Lib.Configs;
 using Drone.Lib.Core;
 
-namespace Drone.Lib.RequestHandlers
+namespace Drone.Lib.CommandHandlers
 {
-	public class InitHandler : RequestHandler
+	public class InitHandler : CommandHandler
 	{
-		public override void Handle(RequestTokens tokens)
+		public override void Handle(CommandTokens tokens)
 		{
 			if (File.Exists(this.Flags.Filename))
 				return;

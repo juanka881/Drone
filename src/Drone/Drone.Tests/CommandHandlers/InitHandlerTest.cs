@@ -1,14 +1,14 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NUnit.Framework;
 
-namespace Drone.Tests.RequestHandlers
+namespace Drone.Tests.CommandHandlers
 {
 	[TestFixture]
-	public class InitHandlerTest : RequestHandlerTest
+	public class InitHandlerTest : CommandHandlerTest
 	{
 		[Test]
 		public void handle_init()

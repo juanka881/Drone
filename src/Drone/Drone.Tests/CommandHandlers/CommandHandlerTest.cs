@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Drone.Lib.RequestHandlers;
+using Drone.Lib.CommandHandlers;
 
-namespace Drone.Tests.RequestHandlers
+namespace Drone.Tests.CommandHandlers
 {
-	public class RequestHandlerTest : TestBase
+	public class CommandHandlerTest : TestBase
 	{
-		private RequestRunner runner;
+		private CommandRunner runner;
 
 		public override void FixtureSetUp()
 		{
-			this.runner = new RequestRunner();
+			this.runner = new CommandRunner();
 		}
 
 		public void Run(string request)

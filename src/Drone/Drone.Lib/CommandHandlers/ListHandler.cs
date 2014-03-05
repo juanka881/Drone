@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Drone.Lib.Core;
 
-namespace Drone.Lib.RequestHandlers
+namespace Drone.Lib.CommandHandlers
 {
-	public class SetHandler : RequestHandler
+	public class ListHandler : CommandHandler
 	{
-		public override void Handle(RequestTokens tokens)
+		public override void Handle(CommandTokens tokens)
 		{
 			throw new NotImplementedException();
 		}

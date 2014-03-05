@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using Drone.Lib.Core;
 
-namespace Drone.Lib.RequestHandlers
+namespace Drone.Lib.CommandHandlers
 {
-	public class RunHandler : RequestHandler
+	public class RunHandler : CommandHandler
 	{
-		public override void Handle(RequestTokens tokens)
+		public override void Handle(CommandTokens tokens)
 		{
 			//this.Log.Info("running");
 			//this.Log.Info("project file: \t{0}", parameter.DroneConfigFilename);

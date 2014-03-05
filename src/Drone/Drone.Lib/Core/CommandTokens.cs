@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace Drone.Lib.Core
 {
-	public class RequestTokens : IEnumerable<KeyValuePair<int, string>>
+	public class CommandTokens : IEnumerable<KeyValuePair<int, string>>
 	{
 		private readonly IList<string> tokens;
 
-		public RequestTokens(IEnumerable<string> tokens)
+		public CommandTokens(IEnumerable<string> tokens)
 		{
 			if (tokens == null)
 				throw new ArgumentNullException("tokens");

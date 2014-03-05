@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Drone.Lib.Core
 {
-	public abstract class RequestHandler
+	public abstract class CommandHandler
 	{
 		public Logger Log { get; set; }
 
@@ -15,9 +15,9 @@ namespace Drone.Lib.Core
 
 		public DroneFlags Flags { get; set; }
 
-		public abstract void Handle(RequestTokens tokens);
+		public abstract void Handle(CommandTokens tokens);
 
-		protected RequestHandler()
+		protected CommandHandler()
 		{
 			this.Flags = new DroneFlags();
 		}

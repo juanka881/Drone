@@ -47,8 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestHandlers\InitHandlerTest.cs" />
-    <Compile Include="RequestHandlers\RequestHandlerTest.cs" />
+    <Compile Include="CommandHandlers\InitHandlerTest.cs" />
+    <Compile Include="CommandHandlers\CommandHandlerTest.cs" />
     <Compile Include="TestBase.cs" />
   </ItemGroup>
   <ItemGroup>
