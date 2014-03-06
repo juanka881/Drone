@@ -17,6 +17,16 @@ namespace Drone.Lib.Core
 
 		public abstract void Handle(CommandTokens tokens);
 
+		public void SaveConfig(DroneConfig config)
+		{
+			this.Repo.Save(config);
+		}
+
+		public DroneConfig LoadConfig()
+		{
+			return this.Repo.Load(this.Flags.ConfigFilename);
+		}
+
 		protected CommandHandler()
 		{
 			this.Flags = new DroneFlags();

@@ -6,6 +6,7 @@ using System.IO;
 
 namespace Drone.Tests
 {
+	[TestFixture]
 	public class TestBase
 	{
 		private readonly IList<Action> fixtureCleanup;
@@ -27,7 +28,7 @@ namespace Drone.Tests
 			this.testCleanup.Add(() => this.CleanUpFile(filename));
 		}
 
-		private void CleanUpFile(string filename)
+		public void CleanUpFile(string filename)
 		{
 			if (File.Exists(filename))
 				File.Delete(filename);

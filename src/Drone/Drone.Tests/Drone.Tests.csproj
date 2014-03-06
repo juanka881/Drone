@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandHandlers\AddHandlerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CommandHandlers\InitHandlerTest.cs" />
     <Compile Include="CommandHandlers\CommandHandlerTest.cs" />

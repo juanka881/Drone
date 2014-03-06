@@ -70,7 +70,7 @@ namespace Drone.Lib.CommandHandlers
 
 		private void SetFlags(CommandHandler handler, CommandTokens tokens)
 		{
-			handler.Flags.Filename = this.GetFlag(tokens, "-f", DroneConfig.DefaultFilename);
+			handler.Flags.ConfigFilename = this.GetFlag(tokens, "-f", DroneConfig.DefaultFilename);
 		}
 
 		private void InjectServices(CommandHandler handler)

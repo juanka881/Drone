@@ -6,7 +6,7 @@ namespace Drone.Lib.Core
 {
 	public class DroneFlags
 	{
-		public string Filename { get; set; }
+		public string ConfigFilename { get; set; }
 		public bool IsDebugEnabled { get; set; }
 	}
 }

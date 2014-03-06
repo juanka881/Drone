@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compilers\DroneProject.cs" />
     <Compile Include="Compilers\CSharpCompiler.cs" />
     <Compile Include="Compilers\CSharpCompilerArgs.cs" />
     <Compile Include="Compilers\CSharpCompilerResult.cs" />
@@ -61,8 +62,8 @@
     <Compile Include="DroneTask.cs" />
     <Compile Include="DroneContext.cs" />
     <Compile Include="DroneModule.cs" />
-    <Compile Include="Compilers\DronefileCompiler.cs" />
-    <Compile Include="Compilers\DronefileCompilerResult.cs" />
+    <Compile Include="Compilers\DroneProjectCompiler.cs" />
+    <Compile Include="Compilers\DroneProjectCompilerResult.cs" />
     <Compile Include="Exceptions\CommandHandlerNotFoundException.cs" />
     <Compile Include="Helpers\ListExtensions.cs" />
     <Compile Include="Helpers\ObjectExtensions.cs" />

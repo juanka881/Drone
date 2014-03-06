@@ -24,7 +24,7 @@ namespace Drone.Lib.CommandHandlers
 
 			//var dronefile = this.Repo.Load(parameter.DroneConfigFilename);
 
-			//var compiler = new DronefileCompiler();
+			//var compiler = new DroneProjectCompiler();
 
 			//compiler.Compile(dronefile);
 

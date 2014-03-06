@@ -12,21 +12,17 @@ namespace Drone.Lib.CommandHandlers
 	{
 		public override void Handle(CommandTokens tokens)
 		{
-			if (File.Exists(this.Flags.Filename))
+			if (File.Exists(this.Flags.ConfigFilename))
+			{
+				this.Log.Warn("file '{0}' already exists", this.Flags.ConfigFilename);
 				return;
+			}
 
-			var currentDir = Directory.GetCurrentDirectory();
+			var droneConfig = new DroneConfig(this.Flags.ConfigFilename, DroneConfig.DefaultBuildDir);
 
-			var filepath = this.Flags.Filename;
+			this.SaveConfig(droneConfig);
 
-			if(!Path.IsPathRooted(filepath))
-				filepath = Path.Combine(currentDir, filepath);
-
-			var buildDir = DroneConfig.DefaultBuildDir;
-
-			var droneConfig = new DroneConfig(filepath, buildDir);
-
-			this.Repo.Save(droneConfig);
+			this.Log.Info("created '{0}'", this.Flags.ConfigFilename);
 		}
 	}
 }

@@ -10,18 +10,42 @@ namespace Drone.Lib.CommandHandlers
 	{
 		public override void Handle(CommandTokens tokens)
 		{
-			//var sourceFiles = p.Files.Where(x => x.EndsWith(".cs")).ToList();
-			//var referenceFiles = p.Files.Where(x => x.EndsWith(".dll")).ToList();
+			var sourceFiles = tokens
+				.Where(x => x.Value.ToLower().EndsWith(".cs"))
+				.Select(x => x.Value)
+				.ToList();
 
-			//var dronefile = this.Repo.Load(p.DroneConfigFilename);
+			var referenceFiles = tokens
+				.Where(x => x.Value.ToLower().EndsWith(".dll"))
+				.Select(x => x.Value)
+				.ToList();
 
-			//foreach (var sourceFile in sourceFiles)
-			//	dronefile.SourceFiles.Remove(sourceFile);
+			if (sourceFiles.Count == 0 && referenceFiles.Count == 0)
+			{
+				this.Log.Warn("nothing to remove. no files specified");
+				return;
+			}
 
-			//foreach (var referenceFile in referenceFiles)
-			//	dronefile.ReferenceFiles.Remove(referenceFile);
+			var config = this.LoadConfig();
 
-			//this.Repo.Save(dronefile, p.DroneConfigFilename);
+			var sourceFilesRemoved = sourceFiles
+				.Where(x => config.SourceFiles.Remove(x))
+				.ToList();
+
+			var referenceFilesRemoved = referenceFiles
+				.Where(x => config.ReferenceFiles.Remove(x))
+				.ToList();
+
+			if (sourceFilesRemoved.Count == 0 && referenceFilesRemoved.Count == 0)
+			{
+				this.Log.Warn("nothing to remove. files dont exists in config");
+				return;
+			}
+
+			this.SaveConfig(config);
+
+			foreach (var file in sourceFilesRemoved.Concat(referenceFilesRemoved))
+				this.Log.Info("removed '{0}'", file);
 		}
 	}
 }
