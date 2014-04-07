@@ -7,7 +7,7 @@ namespace Drone.Lib.Core
 {
 	public class StringTokenizer
 	{
-		public IEnumerable<string> GetTokens(string str)
+		public IEnumerable<StringToken> GetTokens(string str)
 		{
 			if (string.IsNullOrWhiteSpace(str))
 				yield break;
@@ -16,6 +16,7 @@ namespace Drone.Lib.Core
 
 			var sb = new StringBuilder();
 			var stack = new Stack<char>();
+			var counter = 0;
 
 			while (currentIndex != -1)
 			{
@@ -26,27 +27,32 @@ namespace Drone.Lib.Core
 
 				var c = str[startIndex];
 				var endIndex = -1;
+				var type = StringTokenType.Symbol;
 
 				if (this.IsObjectStart(c))
 				{
+					type = StringTokenType.Json;
 					endIndex = this.ReadObjectIntoBuffer(str, startIndex, sb, stack);
 				}
 				else if (this.IsStringStart(c))
 				{
+					type = StringTokenType.String;
 					endIndex = this.ReadStringIntoBuffer(str, startIndex, sb, stack, false);
 				}
 				else
 				{
+					type = StringTokenType.Symbol;
 					endIndex = this.ReadSymbolIntoBuffer(str, startIndex, sb);
 				}
 
 				var token = sb.ToString();
 
-				yield return token;
+				yield return new StringToken(counter, token, type);
 
 				sb.Clear();
 				stack.Clear();
 				currentIndex = endIndex;
+				counter += 1;
 			}
 		}
 

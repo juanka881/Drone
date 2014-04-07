@@ -16,15 +16,15 @@ namespace Drone.Lib.Configs
 				using (var jsonReader = new JsonTextReader(reader))
 				{
 					var serializer = new JsonSerializer();
-					var data = serializer.Deserialize<DroneConfigData>(jsonReader);
+					var config = serializer.Deserialize<DroneConfig>(jsonReader);
 					var fullpath = Path.GetFullPath(filepath);
-					var dronefile = data.ToDroneConfig(fullpath);
-					return dronefile;	
+					config.SetConfigFilename(fullpath);
+					return config;	
 				}
 			}
 		}
 
-		public void Save(DroneConfig droneConfig, Stream stream)
+		public void Save(DroneConfig config, Stream stream)
 		{
 			using (var writer = new StreamWriter(stream))
 			{
@@ -32,8 +32,7 @@ namespace Drone.Lib.Configs
 				{
 					var serializer = new JsonSerializer();
 					serializer.Formatting = Formatting.Indented;
-					var data = droneConfig.ToDroneConfigData();
-					serializer.Serialize(jsonWriter, data);		
+					serializer.Serialize(jsonWriter, config);
 				}
 			}
 		}

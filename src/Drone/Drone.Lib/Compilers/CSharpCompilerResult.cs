@@ -7,45 +7,97 @@ namespace Drone.Lib.Compilers
 {
 	public class CSharpCompilerResult
 	{
-		public bool Success
+		public bool IsSuccess { get; set; }
+
+		public int ExiteCode { get; set; }
+
+		public TimeSpan TimeElapsed { get; set; }
+
+		public IList<string> OutputTextLines { get; set; }
+
+		public IList<string> WarningTextLines { get; set; }
+
+		public class SuccessResult : CSharpCompilerResult
+		{
+			public string OutputAssemblyFilepath { get; set; }
+		}
+
+		public class FailureResult : CSharpCompilerResult
+		{
+			public Exception Exception { get; set; }
+			
+			public IList<string> ErrorTextLines { get; set; }
+		}
+
+		public SuccessResult Success
 		{
 			get
 			{
-				return this.InvocationError == null && this.Errors.Count == 0 && this.ExiteCode == 0;
+				return (SuccessResult) this;
 			}
 		}
 
-		public int ExiteCode { get; private set; }
-		public Exception InvocationError { get; private set; }
-
-		public string OutputText { get; private set; }
-		public string OutputAssemblyFilepath { get; private set; }
-
-		public IList<string> Warnings { get; private set; }
-		public IList<string> Errors { get; private set; }
-
-		public CSharpCompilerResult(int exitCode, 
-			Exception invocationError, 
-			string outputText,
-			string outputAssemblyFile,
-			IEnumerable<string> warnings,
-			IEnumerable<string> errors)
+		public FailureResult Failure
 		{
-			if (string.IsNullOrWhiteSpace(outputAssemblyFile))
-				throw new ArgumentException("OutputAssemblyFile is empty. OutputAssemblyFile is expected to have a non-empty string value");
+			get
+			{
+				return (FailureResult) this;
+			}
+		}
 
-			if (warnings == null)
-				throw new ArgumentNullException("warnings");
+		public static SuccessResult GetSuccess(int exitCode, 
+			TimeSpan timeElapsed,
+			IEnumerable<string> outputTextLines, 
+			IEnumerable<string> warningTextLines, 
+			string outputAssemblyFilepath)
+		{
 
-			if (errors == null)
-				throw new ArgumentNullException("errors");
+			if (outputTextLines == null)
+				throw new ArgumentNullException("outputTextLines");
 
-			this.ExiteCode = exitCode;
-			this.InvocationError = invocationError;
-			this.OutputText = outputText;
-			this.OutputAssemblyFilepath = outputAssemblyFile;
-			this.Warnings = new List<string>(warnings);
-			this.Errors = new List<string>(errors);
+			if (warningTextLines == null)
+				throw new ArgumentNullException("warningTextLines");
+
+			if (string.IsNullOrWhiteSpace(outputAssemblyFilepath))
+				throw new ArgumentException("outputAssemblyFilepath is empty or null", "outputAssemblyFilepath");
+
+			var result = new SuccessResult();
+			result.IsSuccess = true;
+			result.ExiteCode = exitCode;
+			result.TimeElapsed = timeElapsed;
+			result.OutputTextLines = new List<string>(outputTextLines);
+			result.WarningTextLines = new List<string>(warningTextLines);
+			result.OutputAssemblyFilepath = outputAssemblyFilepath;
+
+			return result;
+		}
+
+		public static FailureResult GetFailure(int exitCode,
+			TimeSpan timeElapsed,
+			Exception ex, 
+			IEnumerable<string> outputTextLines, 
+			IEnumerable<string> warningTextLines,
+			IEnumerable<string> errorTextLines)
+		{
+			if (outputTextLines == null)
+				throw new ArgumentNullException("outputTextLines");
+
+			if (warningTextLines == null)
+				throw new ArgumentNullException("warningTextLines");
+
+			if (errorTextLines == null)
+				throw new ArgumentNullException("errorTextLines");
+
+			var result = new FailureResult();
+			result.IsSuccess = false;
+			result.ExiteCode = exitCode;
+			result.TimeElapsed = timeElapsed;
+			result.Exception = ex;
+			result.OutputTextLines = new List<string>(outputTextLines);
+			result.ErrorTextLines = new List<string>(errorTextLines);
+			result.WarningTextLines = new List<string>(warningTextLines);
+
+			return result;
 		}
 	}
 }

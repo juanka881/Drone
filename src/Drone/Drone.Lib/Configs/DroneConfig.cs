@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Drone.Lib.Helpers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Drone.Lib.Configs
 {
@@ -10,49 +13,64 @@ namespace Drone.Lib.Configs
 	{
 		public static readonly string DefaultFilename = "drone.config";
 
-		public static readonly string DefaultBuildDir = "drone.bin";
+		public static readonly string BinDirname = "drone.bin";
 
-		public string FilePath { get; private set; }
+		public static readonly string AssemblyFilename = "drone.user.dll";
 
-		public string FileName { get; private set; }
+		[JsonIgnore]
+		public string HashId { get; private set; }
 
-		public string FileDir { get; private set; }
+		[JsonIgnore]
+		public string Filepath { get; private set; }
 
-		public string BuildDir { get; private set; }
+		[JsonIgnore]
+		public string Filename { get; private set; }
 
-		public string BuildPath { get; private set; }
+		[JsonIgnore]
+		public string Dirname { get; private set; }
 
-		public IList<string> SourceFiles { get; private set; }
+		[JsonIgnore]
+		public string BinDirpath { get; private set; }
 
-		public IList<string> ReferenceFiles { get; private set; }
+		[JsonIgnore]
+		public string AssemblyFilepath { get; private set; }
 
-		public DroneConfig(string filepath, string buildDir) : 
-			this(filepath, buildDir, Enumerable.Empty<string>(), Enumerable.Empty<string>())
+		[JsonProperty("source-files")]
+		public IList<string> SourceFiles { get; set; }
+
+		[JsonProperty("reference-files")]
+		public IList<DroneReferenceFile> ReferenceFiles { get; set; }
+
+		[JsonProperty("properties")]
+		public JObject Properties { get; set; }
+
+		public DroneConfig()
 		{
-			
+			this.SourceFiles = new List<string>();
+			this.ReferenceFiles = new List<DroneReferenceFile>();
+			this.Properties = new JObject();
 		}
 
-		public DroneConfig(string filepath, string buildDir, IEnumerable<string> sourceFiles, IEnumerable<string> referenceFiles)
+		public void SetConfigFilename(string filename)
 		{
-			if (string.IsNullOrWhiteSpace(filepath))
-				throw new ArgumentException("filepath is empty. filepath is expected to have a non-empty string value");
+			if(string.IsNullOrWhiteSpace(filename))
+				throw new ArgumentException("filename is empty or null", "filename");
 
-			if (string.IsNullOrWhiteSpace(buildDir))
-				throw new ArgumentException("buildDir is empty. buildDir is expected to have a non-empty string value");
+			if(Path.IsPathRooted(filename))
+			{
+				this.Filename = Path.GetFileName(filename);
+				this.Filepath = filename;
+			}
+			else
+			{
+				this.Filename = filename;
+				this.Filepath = Path.GetFullPath(this.Filename);
+			}
 
-			if (sourceFiles == null)
-				throw new ArgumentNullException("sourceFiles");
-
-			if (referenceFiles == null)
-				throw new ArgumentNullException("referenceFiles");
-
-			this.FilePath = filepath;
-			this.FileName = Path.GetFileName(this.FilePath);
-			this.FileDir = Path.GetDirectoryName(this.FilePath);
-			this.BuildDir = buildDir;
-			this.BuildPath = Path.Combine(this.FileDir, buildDir);
-			this.SourceFiles = new List<string>(sourceFiles);
-			this.ReferenceFiles = new List<string>(referenceFiles);
+			this.HashId = HashHelper.GetHash(Path.GetFullPath(this.Filepath));
+			this.Dirname = Path.GetDirectoryName(this.Filepath);
+			this.BinDirpath = Path.Combine(Path.GetTempPath(), BinDirname, this.HashId);
+			this.AssemblyFilepath = Path.Combine(this.BinDirpath, AssemblyFilename);
 		}
 	}
 }

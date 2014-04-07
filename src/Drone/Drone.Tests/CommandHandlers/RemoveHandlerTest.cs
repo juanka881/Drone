@@ -6,13 +6,13 @@ using NUnit.Framework;
 
 namespace Drone.Tests.CommandHandlers
 {
-	//public class AddHandlerTest : CommandHandlerTest
+	//public class RemoveHandlerTest : CommandHandlerTest
 	//{
 	//	[Test]
-	//	public void handle_add_nothing()
+	//	public void handle_remove_nothing()
 	//	{
 	//		this.Run("init");
-	//		this.Run("add");
+	//		this.Run("rm");
 
 	//		var config = repo.Load(DroneConfig.DefaultConfigFilename);
 
@@ -21,26 +21,21 @@ namespace Drone.Tests.CommandHandlers
 	//	}
 
 	//	[Test]
-	//	public void handle_add_sourcefiles()
+	//	public void handle_remove_sourcefiles()
 	//	{
 	//		this.Run("init");
 	//		this.Run("add file1.cs");
 
-	//		var config = this.repo.Load(DroneConfig.DefaultConfigFilename);
+	//		var config = repo.Load(DroneConfig.DefaultConfigFilename);
 
 	//		Assert.AreEqual(1, config.SourceFiles.Count);
 	//		Assert.AreEqual(0, config.ReferenceFiles.Count);
-	//	}
 
-	//	[Test]
-	//	public void handle_add_same_sourcefiles()
-	//	{
-	//		this.Run("init");
-	//		this.Run("add file1.cs file1.cs");
+	//		this.Run("rm file1.cs");
 
-	//		var config = this.repo.Load(DroneConfig.DefaultConfigFilename);
+	//		config = repo.Load(DroneConfig.DefaultConfigFilename);
 
-	//		Assert.AreEqual(1, config.SourceFiles.Count);
+	//		Assert.AreEqual(0, config.SourceFiles.Count);
 	//		Assert.AreEqual(0, config.ReferenceFiles.Count);
 	//	}
 	//}

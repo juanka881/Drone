@@ -24,7 +24,7 @@ namespace Drone.Lib.Configs
 			if (repo == null)
 				throw new ArgumentNullException("repo");
 
-			using (var fs = File.Open(droneConfig.FilePath, FileMode.Create, FileAccess.Write))
+			using (var fs = File.Open(droneConfig.Filepath, FileMode.Create, FileAccess.Write))
 			{
 				repo.Save(droneConfig, fs);
 			}

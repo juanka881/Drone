@@ -7,7 +7,8 @@ namespace Drone.Lib
 {
 	public class DroneModule
 	{
-		public static readonly string DefaultTaskName = "default";
+		public static readonly string DefaultTaskName = "def";
+
 		public static readonly string MainModuleName = "dronemain";
 
 		private readonly IDictionary<string, DroneTask> tasks;
@@ -38,23 +39,55 @@ namespace Drone.Lib
 			return this.tasks.GetOrDef(name);
 		}
 
-		public void Register(string name, Action<DroneContext> action)
+		public void Add(string name, IEnumerable<string> deps)
 		{
-			var task = new DroneTask(name, action);
-			this.Register(task);
+			this.Add(name, c => { }, deps);
 		}
 
-		public void Register(DroneTask task)
+		public void Add(string name, params string[] deps)
 		{
+			this.Add(name, c => { }, deps);
+		}
+
+		public void Add(string name, Action<DroneTaskContext> fn)
+		{
+			this.Add(name, fn, Enumerable.Empty<string>());
+		}
+
+		public void Add(string name, Action<DroneTaskContext> fn, params string[] deps)
+		{
+			this.Add(name, fn, deps as IEnumerable<string>);
+		}
+
+		public void Add(string name, Action<DroneTaskContext> fn, IEnumerable<string> deps)
+		{
+			if(string.IsNullOrWhiteSpace(name))
+				throw new ArgumentException("name is empty or null", "name");
+
+			if(deps == null)
+				throw new ArgumentNullException("deps");
+
+			if(fn == null)
+				throw new ArgumentNullException("fn");
+
+			var task = new DroneTask(name, deps, fn);
+			this.Add(task);
+		}
+
+		public void Add(DroneTask task)
+		{
+			if(task == null)
+				throw new ArgumentNullException("task");
+
 			this.tasks[task.Name] = task;
 		}
 
-		public void Register(DroneModule module)
+		public void Add(DroneModule module)
 		{
-			this.Register(string.Empty, module);
+			this.Add(string.Empty, module);
 		}
 
-		public void Register(string ns, DroneModule module)
+		public void Add(string ns, DroneModule module)
 		{
 			if (ns == null)
 				throw new ArgumentNullException("ns");
@@ -69,8 +102,8 @@ namespace Drone.Lib
 				if(!string.IsNullOrWhiteSpace(ns))
 					taskName = string.Format("{0}/{1}", ns, task.Name);
 
-				var newTask = new DroneTask(taskName, task.Action);
-				this.Register(newTask);
+				var newTask = new DroneTask(taskName, task.Dependencies, task.Action);
+				this.Add(newTask);
 			}
 		}
 	}
