@@ -55,6 +55,10 @@
     <Compile Include="Configs\DroneReferenceFile.cs" />
     <Compile Include="Configs\DroneReferenceFileType.cs" />
     <Compile Include="Configs\DroneReferenceFileTypeConverter.cs" />
+    <Compile Include="Core\GACAssemblyResolver.cs" />
+    <Compile Include="Core\GACAssemblyResolveResult.cs" />
+    <Compile Include="Core\Option.cs" />
+    <Compile Include="Core\OptionExtensions.cs" />
     <Compile Include="Core\StringTokenType.cs" />
     <Compile Include="Core\StringTokenSet.cs" />
     <Compile Include="Core\DroneCompiler.cs" />

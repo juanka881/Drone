@@ -63,7 +63,7 @@ namespace Drone.Lib.Core
 					Directory.CreateDirectory(config.BinDirpath);
 				}
 
-				var resolvedReferenceFiles = this.GetResolvedDroneReferenceFiles(config.ReferenceFiles);
+				var resolvedReferenceFiles = this.ResolveDroneReferenceFiles(config.ReferenceFiles);
 
 				var referenceFiles = resolvedReferenceFiles.Concat(this.GetDroneReferenceFiles());
 
@@ -123,7 +123,7 @@ namespace Drone.Lib.Core
 			}
 		}
 
-		private IEnumerable<string> GetResolvedDroneReferenceFiles(IEnumerable<DroneReferenceFile> files)
+		private IEnumerable<string> ResolveDroneReferenceFiles(IEnumerable<DroneReferenceFile> files)
 		{
 			foreach(var file in files)
 			{
