@@ -1,5 +1,9 @@
-1. using gac references, need to be able to expand gac references into full file 
+x 1. using gac references, need to be able to expand gac references into full file 
 references
+
+note: #1 not needed since the way csc.exe resolves usings in the gac 
+
+1. make relative files in config relative to the dir where the config is located at  
 
 2. need to be able to expand {property} into values from the properties found in config
 if the path actually has {} in it, then it can be escaped using \ in front of {, like so
@@ -21,3 +25,5 @@ so it can be called on command line
 8. write docs on how drone works and help for different commands
 
 9. make website for drone, make logo
+
+10. make 
