@@ -7,6 +7,8 @@ using Drone.Lib.Configs;
 using Drone.Lib.Helpers;
 using NLog;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace Drone.Lib.Core
 {
@@ -15,7 +17,7 @@ namespace Drone.Lib.Core
 		public Logger Log { get; set; }
 
 		private static readonly string CompileStatusFilename = "compile-status.json";
-		
+
 		public bool NeedsRecompile(DroneConfig config)
 		{
 			//if (File.Exists(Path.Combine(config.BinDirpath, CompileStatusFilename)))
@@ -27,15 +29,13 @@ namespace Drone.Lib.Core
 			return true;
 		}
 
-		private IList<string> GetDroneReferenceFiles()
+		private IEnumerable<string> GetBaseReferenceFiles()
 		{
-			var path = this.GetDroneAppPath();
-			var list = new List<string>();
-
-			list.Add(Path.Combine(path, "Drone.Lib.dll"));
-			list.Add(Path.Combine(path, "NLog.dll"));
-
-			return list;
+			var appPath = this.GetDroneAppPath();
+			
+			yield return Path.Combine(appPath, "Drone.Lib.dll");
+			yield return Path.Combine(appPath, "Nlog.dll");
+			yield return Path.Combine(appPath, "Newtonsoft.Json.dll");
 		}
 
 		private string GetDroneAppPath()
@@ -63,9 +63,10 @@ namespace Drone.Lib.Core
 					Directory.CreateDirectory(config.BinDirpath);
 				}
 
-				var resolvedReferenceFiles = this.ResolveDroneReferenceFiles(config.ReferenceFiles);
+				var resolvedBaseReferences = this.GetBaseReferenceFiles();
+				var resolvedConfigReferences = this.ResolveReferenceFiles(config.ReferenceFiles, config.Properties);
 
-				var referenceFiles = resolvedReferenceFiles.Concat(this.GetDroneReferenceFiles());
+				var referenceFiles = resolvedBaseReferences.Concat(resolvedConfigReferences).Distinct();
 
 				this.Log.Debug("creating csharp compiler args");
 
@@ -123,21 +124,40 @@ namespace Drone.Lib.Core
 			}
 		}
 
-		private IEnumerable<string> ResolveDroneReferenceFiles(IEnumerable<DroneReferenceFile> files)
+		private IEnumerable<string> ResolveReferenceFiles(IEnumerable<string> files, JObject properties)
 		{
+			var sb = new StringBuilder();
+
 			foreach(var file in files)
 			{
-				var path = file.Path;
+				sb.Clear();
 
-				if(file.Type == DroneReferenceFileType.File)
+				if(Regex.IsMatch(file, @"\%.+\%"))
 				{
-					if(Regex.IsMatch(path, @"\%.+\%"))
+					sb.Append(Environment.ExpandEnvironmentVariables(file));
+				}
+
+				var matches = Regex.Matches(file, @"\{.+\}");
+
+				foreach(var match in matches.OfType<Match>())
+				{
+					if(!match.Success)
+						continue;
+
+					var key = match.Value.Substring(1, match.Value.Length - 1);
+					var token = null as JToken;
+
+					if(properties.TryGetValue(key, out token))
 					{
-						path = Environment.ExpandEnvironmentVariables(path);
+						sb.Replace(match.Value, token.ToString());
+					}
+					else
+					{
+						this.Log.Warn("unable to find property: {0} in config to set replace in path");
 					}
 				}
 
-				yield return path;
+				yield return sb.ToString();
 			}
 		}
 

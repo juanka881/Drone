@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Drone.App.CommandHandlers
 {
-	public class SetHandler : CommandHandler
+	public class SetPropertyHandler : CommandHandler
 	{
 		public override void Handle(StringTokenSet tokens)
 		{
@@ -121,7 +121,7 @@ namespace Drone.App.CommandHandlers
 			if(double.TryParse(val, out d))
 				return true;
 
-			var l = 0l;
+			var l = 0L;
 
 			if(long.TryParse(val, out l))
 				return true;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Drone.Lib.Helpers;
 
 namespace Drone.Lib
 {
@@ -11,22 +12,35 @@ namespace Drone.Lib
 
 		public IList<string> Dependencies { get; private set; }
 
-		public Action<DroneTaskContext> Action { get; private set; }
+		public DroneTask()
+		{
+			this.Name = this.GetType().Name;
+			this.Dependencies = new List<string>();
+		}
 
-		public DroneTask(string name, IEnumerable<string> deps, Action<DroneTaskContext> action)
+		public DroneTask(string name, IEnumerable<string> deps)
 		{
 			if(string.IsNullOrWhiteSpace(name))
 				throw new ArgumentException("name is empty or null", "name");
-
-			if(action == null)
-				throw new ArgumentNullException("action");
 
 			if(deps == null)
 				throw new ArgumentNullException("deps");
 
 			this.Name = name;
 			this.Dependencies = new List<string>(deps);
-			this.Action = action;
+		}
+
+		public DroneTask(string name) : this(name, Enumerable.Empty<string>())
+		{
+			
+		}
+
+		public virtual DroneTask Clone(string newName)
+		{
+			var task = Activator.CreateInstance(this.GetType()) as DroneTask;
+			task.Name = newName;
+			task.Dependencies.AddMany(this.Dependencies);
+			return task;
 		}
 	}
 }

@@ -52,11 +52,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configs\DroneReferenceFile.cs" />
-    <Compile Include="Configs\DroneReferenceFileType.cs" />
-    <Compile Include="Configs\DroneReferenceFileTypeConverter.cs" />
-    <Compile Include="Core\GACAssemblyResolver.cs" />
-    <Compile Include="Core\GACAssemblyResolveResult.cs" />
+    <Compile Include="Core\AutofacDroneTaskHandlerFactory.cs" />
+    <Compile Include="Core\DroneActionTaskHandler.cs" />
+    <Compile Include="Core\DroneFactoryTask.cs" />
+    <Compile Include="Core\DroneFactoryTaskHandler.cs" />
+    <Compile Include="Core\DroneSetFactoryTask.cs" />
+    <Compile Include="DroneTaskHandler.cs" />
+    <Compile Include="Core\DroneTaskHandlerFactory.cs" />
+    <Compile Include="Core\DroneTaskHandlerNotFoundException.cs" />
     <Compile Include="Core\Option.cs" />
     <Compile Include="Core\OptionExtensions.cs" />
     <Compile Include="Core\StringTokenType.cs" />
@@ -77,10 +80,13 @@
     <Compile Include="Core\FuncStopwatchResult.cs" />
     <Compile Include="Core\LogHelper.cs" />
     <Compile Include="Core\StringToken.cs" />
+    <Compile Include="Core\DroneActionTask.cs" />
+    <Compile Include="Core\DroneDependencyOnlyTask.cs" />
+    <Compile Include="DroneModuleExtensions.cs" />
     <Compile Include="DroneTask.cs" />
     <Compile Include="Core\DroneTaskCancelException.cs" />
-    <Compile Include="DroneTaskContext.cs" />
     <Compile Include="DroneModule.cs" />
+    <Compile Include="DroneTaskContext.cs" />
     <Compile Include="DroneTaskResult.cs" />
     <Compile Include="DroneTaskState.cs" />
     <Compile Include="Helpers\HashHelper.cs" />
@@ -103,7 +109,9 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Tasks\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

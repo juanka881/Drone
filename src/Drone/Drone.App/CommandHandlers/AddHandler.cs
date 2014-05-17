@@ -5,7 +5,6 @@ using System.Text;
 using Drone.App.Core;
 using Drone.Lib.Core;
 using Drone.Lib.Helpers;
-using Drone.Lib.Configs;
 
 namespace Drone.App.CommandHandlers
 {
@@ -13,8 +12,7 @@ namespace Drone.App.CommandHandlers
 	{
 		public override void Handle(StringTokenSet tokens)
 		{
-			var files = tokens
-				.Select(x => new 
+			var files = tokens.Select(x => new 
 				{
 					lower = x.Value.ToLower(),
 					val = x.Value
@@ -25,17 +23,10 @@ namespace Drone.App.CommandHandlers
 				.Select(x => x.val)
 				.ToList();
 
-			var dlls = files
+			var refs = files
 				.Where(x => x.lower.EndsWith(".dll"))
-				.Select(x => new DroneReferenceFile(DroneReferenceFileType.File, x.val))
+				.Select(x => x.val)
 				.ToList();
-
-			var gacRefs = files
-				.Where(x => x.lower.StartsWith("gac:"))
-				.Select(x => new DroneReferenceFile(DroneReferenceFileType.GlobalAssemblyCache, x.val.Replace("gac:", string.Empty)))
-				.ToList();
-
-			var refs = dlls.Concat(gacRefs).ToList();
 
 			if(sources.Count == 0 && refs.Count == 0)
 			{
@@ -60,7 +51,7 @@ namespace Drone.App.CommandHandlers
 
 			this.SaveConfig(config);
 
-			foreach (var file in sourcesToAdd.Concat(referencesToAdd.Select(x => x.Path)))
+			foreach (var file in sourcesToAdd.Concat(referencesToAdd))
 				this.Log.Info("added '{0}'", file);
 		}
 	}

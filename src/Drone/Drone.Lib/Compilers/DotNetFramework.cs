@@ -26,8 +26,11 @@ namespace Drone.Lib.Compilers
 		}
 
 		public string Version { get; private set; }
+
 		public string FrameworkDir { get; private set; }
+
 		public string CSharpCompilerBinFilepath { get; private set; }
+
 		public string MSBuildBinFilepath { get; private set; }
 		
 		private string GetFrameworkDir(string ver)

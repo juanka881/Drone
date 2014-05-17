@@ -39,7 +39,7 @@ namespace Drone.Lib.Configs
 		public IList<string> SourceFiles { get; set; }
 
 		[JsonProperty("reference-files")]
-		public IList<DroneReferenceFile> ReferenceFiles { get; set; }
+		public IList<string> ReferenceFiles { get; set; }
 
 		[JsonProperty("properties")]
 		public JObject Properties { get; set; }
@@ -47,7 +47,7 @@ namespace Drone.Lib.Configs
 		public DroneConfig()
 		{
 			this.SourceFiles = new List<string>();
-			this.ReferenceFiles = new List<DroneReferenceFile>();
+			this.ReferenceFiles = new List<string>();
 			this.Properties = new JObject();
 		}
 

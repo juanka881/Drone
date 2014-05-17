@@ -10,6 +10,16 @@ namespace Drone.Lib.Core
 {
 	public class DroneTaskRunner
 	{
+		private readonly DroneTaskHandlerFactory factory;
+
+		public DroneTaskRunner(DroneTaskHandlerFactory factory)
+		{
+			if(factory == null)
+				throw new ArgumentNullException("factory");
+
+			this.factory = factory;
+		}
+
 		public Logger Log { get; set; }
 
 		public IList<DroneTaskResult> Run(DroneModule module, IEnumerable<string> taskNames, DroneConfig config)
@@ -39,7 +49,7 @@ namespace Drone.Lib.Core
 			{
 				this.Log.Debug("checking task names exist...");
 
-				this.CheckTaskNames(module, names);
+				this.EnsureTaskNamesExists(module, names);
 
 				this.Log.Debug("all task names found");
 
@@ -66,7 +76,7 @@ namespace Drone.Lib.Core
 
 					this.Log.Debug("task '{0}' found!, running...", taskName);
 
-					var result = this.Run(task, config);
+					var result = this.Run(module, task, config);
 
 					results.Add(result);
 
@@ -97,10 +107,10 @@ namespace Drone.Lib.Core
 
 			foreach(var result in results)
 			{
-				var glyph = this.GetGlyph(result.State);
-				var state = this.GetStateDesc(result.State);
+				var glyph = this.GetTaskStateGlyph(result.State);
+				var state = this.GetTaskStateDesc(result.State);
 				var name = result.Task.Name;
-				var time = string.Format("({0})", this.GetTime(result.State, result.TimeElapsed));
+				var time = string.Format("({0})", this.GetTaskStateFormatedTime(result.State, result.TimeElapsed));
 				var fmt = string.Format("{{0}} {{1, -{0}}} {{2, -10}} {{3, -10}}", maxNameLen);
 				this.Log.Info(fmt, glyph, name, state, time);
 			}
@@ -108,7 +118,7 @@ namespace Drone.Lib.Core
 			return results;
 		}
 
-		private string GetTime(DroneTaskState state, TimeSpan ts)
+		private string GetTaskStateFormatedTime(DroneTaskState state, TimeSpan ts)
 		{
 			if(state == DroneTaskState.NotRan)
 				return "n/a";
@@ -116,7 +126,7 @@ namespace Drone.Lib.Core
 				return HumanTime.Format(ts);
 		}
 
-		private string GetStateDesc(DroneTaskState state)
+		private string GetTaskStateDesc(DroneTaskState state)
 		{
 			var str = string.Empty;
 
@@ -142,7 +152,7 @@ namespace Drone.Lib.Core
 			return str;
 		}
 
-		private string GetGlyph(DroneTaskState state)
+		private string GetTaskStateGlyph(DroneTaskState state)
 		{
 			var str = string.Empty;
 
@@ -168,7 +178,7 @@ namespace Drone.Lib.Core
 			return str;
 		}
 
-		private void CheckTaskNames(DroneModule module, IList<string> taskNames)
+		private void EnsureTaskNamesExists(DroneModule module, IList<string> taskNames)
 		{
 			var tasksNotFound = taskNames
 						.Where(x => module.TryGetTask(x) == null)
@@ -187,7 +197,7 @@ namespace Drone.Lib.Core
 			{
 				this.Log.Debug("default task found, running...");
 
-				return this.Run(task, config);
+				return this.Run(module, task, config);
 			}
 			else
 			{
@@ -196,14 +206,23 @@ namespace Drone.Lib.Core
 			}
 		}
 
-		private DroneTaskResult Run(DroneTask task, DroneConfig config)
+		private DroneTaskResult Run(DroneModule module, DroneTask task, DroneConfig config)
 		{
 			var taskLog = LogHelper.GetTaskLog(task.Name);
-			var context = new DroneTaskContext(task.Name, taskLog, config);
+
+			var context = new DroneTaskContext(module, task, config, taskLog, (t, c) => this.Run(module, t, c));
 
 			this.Log.Info("running '{0}'", task.Name);
 
-			var result = FuncStopwatch.Run(() => task.Action(context));
+			var handler = this.factory.TryGetHandler(task);
+
+			var result = FuncStopwatch.Run(() =>
+			{
+				if(handler == null)
+					throw DroneTaskHandlerNotFoundException.Get(task);
+
+				handler.Handle(context);
+			});
 
 			if (result.IsSuccess)
 			{

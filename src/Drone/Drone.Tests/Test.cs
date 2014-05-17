@@ -17,8 +17,8 @@ namespace Drone.Tests
 			var config = new DroneConfig();
 			config.SetConfigFilename("drone.config");
 
-			config.ReferenceFiles.Add(new DroneReferenceFile(DroneReferenceFileType.File, "file1.cs"));
-			config.ReferenceFiles.Add(new DroneReferenceFile(DroneReferenceFileType.GlobalAssemblyCache, "System.Data"));
+			//config.ReferenceFiles.Register(new DroneReferenceFile(DroneReferenceFileType.File, "file1.cs"));
+			//config.ReferenceFiles.Register(new DroneReferenceFile(DroneReferenceFileType.GlobalAssemblyCache, "System.Data"));
 
 			var repo = new DroneConfigRepo();
 

@@ -1,39 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Drone.Lib.Core;
-using NLog;
 using Drone.Lib.Configs;
+using NLog;
 
 namespace Drone.Lib
 {
 	public class DroneTaskContext
 	{
-		public string TaskName { get; private set; }
+		private readonly Action<DroneTask, DroneConfig> runTask;
 
-		public Logger Log { get; private set; }
-
-		public DroneConfig Config { get; private set; }
-
-		public DroneTaskContext(string name, Logger log, DroneConfig config)
+		public DroneTaskContext(
+			DroneModule module,
+			DroneTask task, 
+			DroneConfig config, 
+			Logger taskLog, 
+			Action<DroneTask, DroneConfig> runTask)
 		{
-			if (string.IsNullOrWhiteSpace(name))
-				throw new ArgumentException("name is empty or null", "name");
+			if(module == null)
+				throw new ArgumentNullException("module");
 
-			if (log == null) 
-				throw new ArgumentNullException("log");
+			if(task == null)
+				throw new ArgumentNullException("task");
 
 			if(config == null)
 				throw new ArgumentNullException("config");
 
-			this.TaskName = name;
-			this.Log = log;
+			if(taskLog == null)
+				throw new ArgumentNullException("taskLog");
+
+			if(runTask == null)
+				throw new ArgumentNullException("runTask");
+
+			this.Module = module;
+			this.Task = task;
 			this.Config = config;
+			this.Log = taskLog;
+			this.runTask = runTask;
 		}
 
-		public void Cancel(Exception ex = null)
+		public DroneModule Module { get; private set; }
+
+		public DroneTask Task { get; private set; }
+
+		public DroneConfig Config { get; private set; }
+
+		public Logger Log { get; private set; }
+
+		public void Run(DroneTask task)
 		{
-			throw DroneTaskCancelException.Get(ex, this.TaskName);
+			this.runTask(task, this.Config);
+		}
+
+		public void Run(string taskName)
+		{
+			this.Run(this.Module.TryGetTask(taskName));
 		}
 	}
 }

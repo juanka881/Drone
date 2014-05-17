@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Drone.App.CommandHandlers;
+using Drone.Lib;
 using Drone.Lib.Configs;
 using Drone.Lib.Core;
 using NLog;
@@ -193,9 +194,15 @@ namespace Drone.App.Core
 				.AsSelf()
 				.PropertiesAutowired();
 
-			builder.Register(c => new DroneTaskRunner())
+			builder.Register(c => new DroneTaskRunner(c.Resolve<AutofacDroneTaskHandlerFactory>()))
 				.AsSelf()
 				.PropertiesAutowired();
+
+			builder.Register(c =>
+			{
+				var scope = c.Resolve<ILifetimeScope>();
+				return new AutofacDroneTaskHandlerFactory(scope);
+			}).SingleInstance();
 
 			// handlers
 			builder.Register(c => new InitHandler())
@@ -218,12 +225,16 @@ namespace Drone.App.Core
 				.Keyed<CommandHandler>("r")
 				.PropertiesAutowired();
 
-			builder.Register(c => new SetHandler())
-				.Keyed<CommandHandler>("set")
+			builder.Register(c => new SetPropertyHandler())
+				.Keyed<CommandHandler>("setp")
 				.PropertiesAutowired();
 
-			builder.Register(c => new GetHandler())
-				.Keyed<CommandHandler>("get")
+			builder.Register(c => new GetPropertyHandler())
+				.Keyed<CommandHandler>("getp")
+				.PropertiesAutowired();
+
+			builder.Register(c => new RemovePropertyHandler())
+				.Keyed<CommandHandler>("rmp")
 				.PropertiesAutowired();
 
 			builder.Register(c => new ListHandler())

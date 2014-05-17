@@ -24,17 +24,10 @@ namespace Drone.App.CommandHandlers
 				.Select(x => x.val)
 				.ToList();
 
-			var dlls = files
+			var refs = files
 				.Where(x => x.lower.EndsWith(".dll"))
-				.Select(x => new DroneReferenceFile(DroneReferenceFileType.File, x.val))
+				.Select(x => x.val)
 				.ToList();
-
-			var gacRefs = files
-				.Where(x => x.lower.StartsWith("gac:"))
-				.Select(x => new DroneReferenceFile(DroneReferenceFileType.GlobalAssemblyCache, x.val.Replace("gac:", string.Empty)))
-				.ToList();
-
-			var refs = dlls.Concat(gacRefs).ToList();
 
 			if (sources.Count == 0 && refs.Count == 0)
 			{
@@ -60,7 +53,7 @@ namespace Drone.App.CommandHandlers
 
 			this.SaveConfig(config);
 
-			foreach (var file in sourcesRemoved.Concat(referencesRemoved.Select(x => x.Path)))
+			foreach (var file in sourcesRemoved.Concat(referencesRemoved))
 				this.Log.Info("removed '{0}'", file);
 		}
 	}

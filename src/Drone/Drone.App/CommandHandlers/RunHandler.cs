@@ -5,6 +5,7 @@ using System.Text;
 using Drone.App.Core;
 using Drone.Lib.Core;
 using Drone.Lib.Helpers;
+using Autofac;
 
 namespace Drone.App.CommandHandlers
 {

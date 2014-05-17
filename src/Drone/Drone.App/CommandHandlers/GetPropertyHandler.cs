@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Drone.App.CommandHandlers
 {
-	public class GetHandler : CommandHandler
+	public class GetPropertyHandler : CommandHandler
 	{
 		public override void Handle(StringTokenSet tokens)
 		{

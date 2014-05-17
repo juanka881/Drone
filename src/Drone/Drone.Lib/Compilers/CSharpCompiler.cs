@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Drone.Lib.Helpers;
 using SlavaGu.ConsoleAppLauncher;
@@ -56,10 +57,14 @@ namespace Drone.Lib.Compilers
 				consoleApp = new ConsoleApp(command, commandArgs);
 
 				consoleApp.ConsoleOutput += App_OnConsoleOutput;
-
+				
 				consoleApp.Run();
 				consoleApp.WaitForExit();
 
+				var method = typeof(ConsoleApp).GetMethod("DispatchProcessOutput", BindingFlags.Instance | BindingFlags.NonPublic);
+
+				method.Invoke(consoleApp, null);
+				
 				if(consoleApp.ExitCode == null)
 					throw ConsoleAppUnableToGetExitCodeException.Get(command, commandArgs);
 
