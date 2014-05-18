@@ -16,5 +16,10 @@ namespace Drone.Lib.Core
 
 			this.Action = action;
 		}
+
+		public override DroneTask Clone(string newName)
+		{
+			return this.Clone(newName, x => x.Action = this.Action);
+		}
 	}
 }

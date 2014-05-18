@@ -54,9 +54,12 @@
   <ItemGroup>
     <Compile Include="Core\AutofacDroneTaskHandlerFactory.cs" />
     <Compile Include="Core\DroneActionTaskHandler.cs" />
+    <Compile Include="Core\DroneDependencyOnlyTaskHandler.cs" />
     <Compile Include="Core\DroneFactoryTask.cs" />
     <Compile Include="Core\DroneFactoryTaskHandler.cs" />
     <Compile Include="Core\DroneSetFactoryTask.cs" />
+    <Compile Include="Core\DroneSetFactoryTaskHandler.cs" />
+    <Compile Include="DroneTaskExtensions.cs" />
     <Compile Include="DroneTaskHandler.cs" />
     <Compile Include="Core\DroneTaskHandlerFactory.cs" />
     <Compile Include="Core\DroneTaskHandlerNotFoundException.cs" />

@@ -16,18 +16,10 @@ namespace Drone.Lib.Core
 
 			this.Factory = factory;
 		}
-	}
 
-	public class DroneSetFactoryTaskHandler : DroneTaskHandler<DroneSetFactoryTask>
-	{
-		public override void Handle(DroneSetFactoryTask task, DroneTaskContext context)
+		public override DroneTask Clone(string newName)
 		{
-			var set = task.Factory(context);
-			var e = set.GetEnumerator();
-			while(e.MoveNext())
-			{
-				context.Run(e.Current);
-			}
+			return this.Clone(newName, x => x.Factory = this.Factory);
 		}
 	}
 }

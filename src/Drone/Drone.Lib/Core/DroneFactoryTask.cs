@@ -16,5 +16,10 @@ namespace Drone.Lib.Core
 
 			this.Factory = factory;
 		}
+
+		public override DroneTask Clone(string newName)
+		{
+			return this.Clone(newName, x => x.Factory = this.Factory);
+		}
 	}
 }
