@@ -7,6 +7,7 @@ using Drone.Lib.Helpers;
 using SlavaGu.ConsoleAppLauncher;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.IO;
 
 namespace Drone.Lib.Compilers
 {
@@ -44,18 +45,21 @@ namespace Drone.Lib.Compilers
 			var command = string.Empty;
 			var commandArgs = string.Empty;
 			var sw = new Stopwatch();
+			var responseFilename = string.Empty;
 			
 			try
 			{
 				sw.Start();
 
 				var framework = DotNetFramework.Version40;
+				responseFilename = Path.GetTempFileName();
+				commandArgs = string.Format("@{0}", responseFilename);
 
 				command = framework.CSharpCompilerBinFilepath;
-				commandArgs = this.GetCompilerArgString(args);
+				var responseFileText = this.GetCompilerArgString(args);
+				File.WriteAllText(responseFilename, responseFileText);
 
 				consoleApp = new ConsoleApp(command, commandArgs);
-
 				consoleApp.ConsoleOutput += App_OnConsoleOutput;
 				
 				consoleApp.Run();
@@ -104,6 +108,18 @@ namespace Drone.Lib.Compilers
 			{
 				if (consoleApp != null)
 					consoleApp.ConsoleOutput -= App_OnConsoleOutput;
+
+				if(File.Exists(responseFilename))
+				{
+					try
+					{
+						File.Delete(responseFilename);
+					}
+					catch(Exception)
+					{
+						
+					}
+				}
 
 				this.outputTextLines.Clear();
 				this.warningTextLines.Clear();
@@ -160,18 +176,18 @@ namespace Drone.Lib.Compilers
 			var sourceFiles = this.GetSourceFiles(fixedSourceFiles);
 
 			sb.Append(output)
-				.Append(" ")
+				.AppendLine()
 				.Append(TargetSwitch)
-				.Append(" ")
+				.AppendLine()
 				.Append(OptimizeSwitch)
-				.Append(" ")
+				.AppendLine()
 				.Append(NoLogoSwitch);
 
 			if (!string.IsNullOrWhiteSpace(referenceFiles))
-				sb.Append(" ").Append(referenceFiles);
+				sb.AppendLine().Append(referenceFiles);
 
 			if (!string.IsNullOrWhiteSpace(sourceFiles))
-				sb.Append(" ").Append(sourceFiles);
+				sb.AppendLine().Append(sourceFiles);
 
 			var text = sb.ToString();
 			return text;
@@ -193,8 +209,8 @@ namespace Drone.Lib.Compilers
 
 				sb.Append("\"").Append(item).Append("\"");
 
-				if (i != items.Count - 1)
-					sb.Append(" ");
+				if(i != items.Count - 1)
+					sb.AppendLine();
 			}
 
 			var text = sb.ToString();
@@ -215,7 +231,7 @@ namespace Drone.Lib.Compilers
 					.Append("\"");
 
 				if (i != items.Count - 1)
-					sb.Append(" ");
+					sb.AppendLine();
 			}
 
 			var text = sb.ToString();
