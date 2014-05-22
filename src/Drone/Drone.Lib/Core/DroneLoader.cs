@@ -49,11 +49,16 @@ namespace Drone.Lib.Core
 
 				this.Log.Debug("creating drone module instance from type: '{0}'", moduleType.FullName);
 
-				var module = Activator.CreateInstance(moduleType) as DroneModule;
-
-				this.Log.Debug("drone module created");
-
-				return module;
+				try
+				{
+					var module = Activator.CreateInstance(moduleType) as DroneModule;
+					this.Log.Debug("drone module created");
+					return module;
+				}
+				catch(Exception ex)
+				{
+					throw DroneCreateMainModuleFailedException.Get(ex, moduleType);
+				}
 			}
 			else
 			{

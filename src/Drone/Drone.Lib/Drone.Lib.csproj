@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Core\AutofacDroneTaskHandlerFactory.cs" />
     <Compile Include="Core\DroneActionTaskHandler.cs" />
+    <Compile Include="Core\DroneCreateMainModuleFailedException.cs" />
     <Compile Include="Core\DroneDependencyOnlyTaskHandler.cs" />
     <Compile Include="Core\DroneFactoryTask.cs" />
     <Compile Include="Core\DroneFactoryTaskHandler.cs" />
