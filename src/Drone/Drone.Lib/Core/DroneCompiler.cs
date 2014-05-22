@@ -7,7 +7,6 @@ using Drone.Lib.Configs;
 using Drone.Lib.Helpers;
 using NLog;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
 using System.Text;
 
 namespace Drone.Lib.Core
@@ -15,8 +14,6 @@ namespace Drone.Lib.Core
 	public class DroneCompiler
 	{
 		public Logger Log { get; set; }
-
-		private static readonly string CompileStatusFilename = "compile-status.json";
 
 		public bool NeedsRecompile(DroneConfig config)
 		{
@@ -64,7 +61,7 @@ namespace Drone.Lib.Core
 				}
 
 				var resolvedBaseReferences = this.GetBaseReferenceFiles();
-				var resolvedConfigReferences = this.ResolveReferenceFiles(config.ReferenceFiles, config.Properties);
+				var resolvedConfigReferences = this.ResolveReferenceFiles(config.ReferenceFiles);
 
 				var referenceFiles = resolvedBaseReferences.Concat(resolvedConfigReferences).Distinct();
 
@@ -102,13 +99,6 @@ namespace Drone.Lib.Core
 				if (result.IsSuccess)
 				{
 					this.Log.Debug("output assembly filepath: '{0}'", result.Success.OutputAssemblyFilepath);
-
-					//this.Log.Debug("deleting 'needs compile' marker file");
-					//File.Delete(Path.Combine(config.BinDirpath, CompileStatusFilename));
-				}
-				else
-				{
-					//File.WriteAllText(Path.Combine(config.BinDirpath, CompileStatusFilename), string.Empty);
 				}
 
 				return result;
@@ -124,7 +114,7 @@ namespace Drone.Lib.Core
 			}
 		}
 
-		private IEnumerable<string> ResolveReferenceFiles(IEnumerable<string> files, JObject properties)
+		private IEnumerable<string> ResolveReferenceFiles(IEnumerable<string> files)
 		{
 			var sb = new StringBuilder();
 
@@ -136,25 +126,9 @@ namespace Drone.Lib.Core
 				{
 					sb.Append(Environment.ExpandEnvironmentVariables(file));
 				}
-
-				var matches = Regex.Matches(file, @"\{.+\}");
-
-				foreach(var match in matches.OfType<Match>())
+				else
 				{
-					if(!match.Success)
-						continue;
-
-					var key = match.Value.Substring(1, match.Value.Length - 1);
-					var token = null as JToken;
-
-					if(properties.TryGetValue(key, out token))
-					{
-						sb.Replace(match.Value, token.ToString());
-					}
-					else
-					{
-						this.Log.Warn("unable to find property: {0} in config to set replace in path");
-					}
+					sb.Append(file);
 				}
 
 				yield return sb.ToString();
