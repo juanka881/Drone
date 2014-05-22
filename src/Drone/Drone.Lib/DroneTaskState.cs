@@ -8,7 +8,6 @@ namespace Drone.Lib
 	{
 		NotRan,
 		Faulted,
-		Cancelled,
 		Completed
 	}
 }

@@ -88,7 +88,7 @@
     <Compile Include="Core\DroneDependencyOnlyTask.cs" />
     <Compile Include="DroneModuleExtensions.cs" />
     <Compile Include="DroneTask.cs" />
-    <Compile Include="Core\DroneTaskCancelException.cs" />
+    <Compile Include="Core\DroneTaskFailedException.cs" />
     <Compile Include="DroneModule.cs" />
     <Compile Include="DroneTaskContext.cs" />
     <Compile Include="DroneTaskResult.cs" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Drone.Lib.Configs;
+using Drone.Lib.Core;
 using NLog;
 
 namespace Drone.Lib
@@ -55,6 +56,14 @@ namespace Drone.Lib
 		public void Run(string taskName)
 		{
 			this.Run(this.Module.TryGetTask(taskName));
+		}
+
+		public void Fail(string message = null, Exception ex = null)
+		{
+			if(!string.IsNullOrWhiteSpace(message))
+				this.Log.Error(message);
+
+			throw DroneTaskFailedException.Get(ex, this.Task.Name);
 		}
 	}
 }

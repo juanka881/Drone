@@ -76,7 +76,7 @@ namespace Drone.Lib.Core
 
 					this.Log.Debug("task '{0}' found!, running...", taskName);
 
-					var result = this.Run(module, task, config);
+					var result = this.Run(module, task, config, true);
 
 					results.Add(result);
 
@@ -140,10 +140,6 @@ namespace Drone.Lib.Core
 					str = "faulted";
 					break;
 
-				case DroneTaskState.Cancelled:
-					str = "cancelled";
-					break;
-
 				case DroneTaskState.Completed:
 					str = "completed";
 					break;
@@ -164,10 +160,6 @@ namespace Drone.Lib.Core
 
 				case DroneTaskState.Faulted:
 					str = "■";
-					break;
-
-				case DroneTaskState.Cancelled:
-					str = "∙";
 					break;
 
 				case DroneTaskState.Completed:
@@ -197,7 +189,7 @@ namespace Drone.Lib.Core
 			{
 				this.Log.Debug("default task found, running...");
 
-				return this.Run(module, task, config);
+				return this.Run(module, task, config, true);
 			}
 			else
 			{
@@ -206,11 +198,19 @@ namespace Drone.Lib.Core
 			}
 		}
 
-		private DroneTaskResult Run(DroneModule module, DroneTask task, DroneConfig config)
+		private DroneTaskResult Run(DroneModule module, DroneTask task, DroneConfig config, bool logErrors)
 		{
 			var taskLog = LogHelper.GetTaskLog(task.Name);
 
-			var context = new DroneTaskContext(module, task, config, taskLog, (t, c) => this.Run(module, t, c));
+			var context = new DroneTaskContext(module, task, config, taskLog, (t, c) =>
+			{
+				var childTaskResult = this.Run(module, t, c, false);
+
+				if(!childTaskResult.IsSuccess)
+					this.Log.Debug("child task '{0}' has failed", t.Name);
+
+				throw childTaskResult.Exception;
+			});
 
 			this.Log.Info("running '{0}'", task.Name);
 
@@ -234,14 +234,10 @@ namespace Drone.Lib.Core
 				var state = DroneTaskState.Faulted;
 				var stateName = "failed";
 
-				if (result.Exception is DroneTaskCancelException)
-				{
-					state = DroneTaskState.Cancelled;
-					stateName = "cancelled";
-				}
-
 				this.Log.Info("task '{0}' {1} ({2})", task.Name, stateName, HumanTime.Format(result.TimeElapsed));
-				this.Log.ExceptionAndData(result.Exception);
+
+				if(logErrors)
+					this.Log.ExceptionAndData(result.Exception);
 				
 				return new DroneTaskResult(task, state, result.TimeElapsed, result.Exception);
 			}
