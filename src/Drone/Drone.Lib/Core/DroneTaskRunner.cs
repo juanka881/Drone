@@ -206,9 +206,10 @@ namespace Drone.Lib.Core
 				var childTaskResult = this.Run(module, t, c, false);
 
 				if(!childTaskResult.IsSuccess)
-					this.Log.Debug("child task '{0}' has failed", t.Name);
-
-				throw childTaskResult.Exception;
+				{
+					his.Log.Debug("child task '{0}' has failed", t.Name);
+					throw childTaskResult.Exception;
+				}
 			});
 
 			this.Log.Info("running '{0}'", task.Name);
