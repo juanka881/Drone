@@ -60,17 +60,21 @@ namespace Drone.Lib.Core
 					Directory.CreateDirectory(config.BinDirpath);
 				}
 
-				var resolvedBaseReferences = this.GetBaseReferenceFiles();
-				var resolvedConfigReferences = this.ResolveReferenceFiles(config.ReferenceFiles);
+				var configDirpath = Path.GetDirectoryName(config.Filepath);
 
-				var referenceFiles = resolvedBaseReferences.Concat(resolvedConfigReferences).Distinct();
+				var resolvedBaseReferences = this.GetBaseReferenceFiles();
+				var resolvedConfigReferences = this.ResolveReferenceFiles(config.ReferenceFiles, configDirpath);
+
+				var referenceFiles = resolvedBaseReferences.Concat(resolvedConfigReferences).Distinct().ToList();
+
+				var sourceFiles = this.ResolveSourceFiles(config.SourceFiles, configDirpath).ToList();
 
 				this.Log.Debug("creating csharp compiler args");
 
 				var args = new CSharpCompilerArgs(
 					config.Dirname,
 					config.AssemblyFilepath,
-					config.SourceFiles,
+					sourceFiles,
 					referenceFiles);
 
 				if (this.Log.IsDebugEnabled)
@@ -80,12 +84,12 @@ namespace Drone.Lib.Core
 					this.Log.Debug("output filepath: '{0}'", args.OutputFilepath);
 					this.Log.Debug("source files:");
 
-					foreach (var file in args.SourceFiles)
+					foreach (var file in sourceFiles)
 						this.Log.Debug(file);
 
 					this.Log.Debug("reference files:");
 
-					foreach (var file in args.ReferenceFiles)
+					foreach (var file in referenceFiles)
 						this.Log.Debug(file);
 				}
 
@@ -114,7 +118,20 @@ namespace Drone.Lib.Core
 			}
 		}
 
-		private IEnumerable<string> ResolveReferenceFiles(IEnumerable<string> files)
+		private IEnumerable<string> ResolveSourceFiles(IList<string> files, string configDirpath)
+		{
+			foreach(var file in files)
+			{
+				var fullpath = file;
+
+				if(!Path.IsPathRooted(file))
+					fullpath = Path.Combine(configDirpath, file);
+
+				yield return fullpath;
+			}
+		}
+
+		private IEnumerable<string> ResolveReferenceFiles(IEnumerable<string> files, string configDirpath)
 		{
 			var sb = new StringBuilder();
 
@@ -122,13 +139,18 @@ namespace Drone.Lib.Core
 			{
 				sb.Clear();
 
-				if(Regex.IsMatch(file, @"\%.+\%"))
+				var fullPath = file;
+
+				if(!Path.IsPathRooted(fullPath))
+					fullPath = Path.Combine(configDirpath, file);
+
+				if(Regex.IsMatch(fullPath, @"\%.+\%"))
 				{
-					sb.Append(Environment.ExpandEnvironmentVariables(file));
+					sb.Append(Environment.ExpandEnvironmentVariables(fullPath));
 				}
 				else
 				{
-					sb.Append(file);
+					sb.Append(fullPath);
 				}
 
 				yield return sb.ToString();
