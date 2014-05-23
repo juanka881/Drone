@@ -207,7 +207,7 @@ namespace Drone.Lib.Core
 
 				if(!childTaskResult.IsSuccess)
 				{
-					his.Log.Debug("child task '{0}' has failed", t.Name);
+					this.Log.Debug("child task '{0}' has failed", t.Name);
 					throw childTaskResult.Exception;
 				}
 			});
