@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Drone.Lib;
 using NUnit.Framework;
 using Drone.Lib.Helpers;
 using Drone.Lib.Configs;

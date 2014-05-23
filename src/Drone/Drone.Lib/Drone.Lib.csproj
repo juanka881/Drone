@@ -97,7 +97,7 @@
     <Compile Include="Helpers\ListExtensions.cs" />
     <Compile Include="Helpers\ObjectExtensions.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
-    <Compile Include="Configs\DroneConfig.cs" />
+    <Compile Include="DroneConfig.cs" />
     <Compile Include="Core\DroneMainModuleNotFoundException.cs" />
     <Compile Include="Core\DroneTaskRunner.cs" />
     <Compile Include="Core\DroneTasksNotFoundException.cs" />

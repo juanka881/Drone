@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Drone.App.Core;
+using Drone.Lib;
 using Drone.Lib.Core;
-using Drone.Lib.Helpers;
-using Autofac;
 
 namespace Drone.App.CommandHandlers
 {
@@ -16,6 +15,8 @@ namespace Drone.App.CommandHandlers
 		public override void Handle(StringTokenSet tokens)
 		{
 			var config = this.LoadConfig();
+
+			DroneConfig.Current = config;
 
 			var module = this.CompileAndLoadModule(config);
 

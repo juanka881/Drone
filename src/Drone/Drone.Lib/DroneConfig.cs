@@ -1,13 +1,13 @@
-﻿using Drone.Lib.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Drone.Lib.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Drone.Lib.Configs
+namespace Drone.Lib
 {
 	public class DroneConfig
 	{
@@ -16,6 +16,8 @@ namespace Drone.Lib.Configs
 		public static readonly string BinDirname = "drone.bin";
 
 		public static readonly string AssemblyFilename = "drone.user.dll";
+
+		public static DroneConfig Current;
 
 		[JsonIgnore]
 		public string HashId { get; private set; }
