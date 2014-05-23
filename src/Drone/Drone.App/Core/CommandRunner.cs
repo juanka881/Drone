@@ -36,7 +36,9 @@ namespace Drone.App.Core
 			var requestToken = tokens.Pop();
 			var request = "help";
 
-			if(requestToken != null && requestToken.Value == "drone")
+			var commandLineArgs = Environment.GetCommandLineArgs();
+
+			if(requestToken != null && commandLineArgs != null && commandLineArgs.Length >= 1 && requestToken.Value == commandLineArgs[0])
 				requestToken = tokens.Pop();
 
 			if (requestToken != null)
