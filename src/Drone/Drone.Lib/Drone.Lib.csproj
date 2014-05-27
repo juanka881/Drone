@@ -33,9 +33,6 @@
     <Reference Include="Autofac">
       <HintPath>..\..\..\packages\Autofac.3.3.0\lib\net40\Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="ConsoleAppLauncher">
-      <HintPath>..\..\..\packages\ConsoleAppLauncher.1.0.4838.20605\lib\net40\ConsoleAppLauncher.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
