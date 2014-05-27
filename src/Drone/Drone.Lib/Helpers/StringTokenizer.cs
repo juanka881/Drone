@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Drone.Lib.Core;
 
-namespace Drone.Lib.Core
+namespace Drone.Lib.Helpers
 {
 	public class StringTokenizer
 	{

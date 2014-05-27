@@ -199,7 +199,7 @@ namespace Drone.Lib.Core
 
 		private DroneTaskResult Run(DroneModule module, DroneTask task, DroneConfig config, bool logErrors)
 		{
-			var taskLog = LogHelper.GetTaskLog(task.Name);
+			var taskLog = DroneLogHelper.GetTaskLog(task.Name);
 
 			var context = new DroneTaskContext(module, task, config, taskLog, (t, c) =>
 			{

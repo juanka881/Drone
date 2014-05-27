@@ -6,6 +6,7 @@ using Drone.App.CommandHandlers;
 using Drone.Lib;
 using Drone.Lib.Configs;
 using Drone.Lib.Core;
+using Drone.Lib.Helpers;
 using NLog;
 using Autofac;
 using NLog.Config;
@@ -15,6 +16,16 @@ namespace Drone.App.Core
 {
 	public class CommandRunner
 	{
+		private static readonly LogLevel[] logLevels = 
+		{
+			LogLevel.Fatal,
+			LogLevel.Error,
+			LogLevel.Warn,
+			LogLevel.Info,
+			LogLevel.Debug,
+			LogLevel.Trace
+		};
+
 		private readonly IContainer container;
 		private readonly Logger log;
 		
@@ -70,6 +81,7 @@ namespace Drone.App.Core
 					break;
 
 				case "error":
+				case "err":
 					level = LogLevel.Error;
 					break;
 
@@ -114,11 +126,20 @@ namespace Drone.App.Core
 				throw new ArgumentNullException("flags");
 
 			var rules = (from rule in LogManager.Configuration.LoggingRules
-						 from target in rule.Targets
-						 where target.Name == "drone.colored.console" || target.Name == "drone.task.colored.console"
+						 where rule.LoggerNamePattern == "drone" || rule.LoggerNamePattern == "drone.task.*"
 						 select rule).ToList();
 
-			this.ApplyLogLevel(rules, flags.LogLevel);
+			foreach(var rule in rules)
+			{
+				var level = flags.LogLevel;
+
+				if(rule.LoggerNamePattern == "drone" && level > LogLevel.Info)
+					level = LogLevel.Info;
+
+				var effectiveLevels = logLevels.Where(l => l >= level).ToList();
+
+				this.ApplyLogLevel(rule, effectiveLevels);
+			}
 			
 			if(flags.IsConsoleLogColorsDisabled)
 				this.DisableConsoleLogColors(rules);
@@ -126,19 +147,13 @@ namespace Drone.App.Core
 			LogManager.ReconfigExistingLoggers();
 		}
 
-		private void ApplyLogLevel(IList<LoggingRule> rules, LogLevel level)
+		private void ApplyLogLevel(LoggingRule rule, IList<LogLevel> levels)
 		{
-			foreach (var rule in rules)
-			{
-				if (level == LogLevel.Off)
-				{
-					rule.Targets.Clear();
-				}
-				else
-				{
-					rule.EnableLoggingForLevel(level);
-				}
-			}
+			foreach(var level in rule.Levels)
+				rule.DisableLoggingForLevel(level);
+
+			foreach(var level in levels)
+				rule.EnableLoggingForLevel(level);
 		}
 
 		private void DisableConsoleLogColors(IList<LoggingRule> rules)
@@ -160,7 +175,7 @@ namespace Drone.App.Core
 
 			try
 			{
-				LogHelper.DeleteErrorLogFile();
+				DroneLogHelper.DeleteErrorLogFile();
 
 				var tokens = this.GetTokens(commandString);
 				var flags = this.GetFlags(tokens);
@@ -169,8 +184,6 @@ namespace Drone.App.Core
 
 				handler = this.GetHandler(tokens);
 				handler.Flags = flags;
-
-				//this.InjectServices(handler);
 
 				handler.Handle(tokens);	
 			}
@@ -185,7 +198,7 @@ namespace Drone.App.Core
 			var builder = new ContainerBuilder();
 
 			// core services
-			builder.Register(c => LogHelper.GetLog()).AsSelf();
+			builder.Register(c => DroneLogHelper.GetLog()).AsSelf();
 			builder.Register(c => new DroneConfigRepo()).AsSelf();
 
 			builder.Register(c => new DroneCompiler())

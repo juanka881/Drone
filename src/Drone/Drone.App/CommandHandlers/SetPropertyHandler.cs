@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Drone.App.Core;
 using Drone.Lib.Core;
+using Drone.Lib.Helpers;
 using Newtonsoft.Json.Linq;
 
 namespace Drone.App.CommandHandlers
@@ -66,12 +67,9 @@ namespace Drone.App.CommandHandlers
 					break;
 
 				case "str":
-					result = JToken.Parse(string.Format("'{0}'", token.Value));
-					break;
-
 				case "num":
 				case "bool":
-					result = JToken.Parse(token.Value);
+					result = new JValue(token.Value);
 					break;
 
 				default:

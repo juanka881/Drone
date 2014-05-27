@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
+using Drone.Lib.DotNet;
 using Drone.Lib.Helpers;
-using SlavaGu.ConsoleAppLauncher;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 using System.IO;
 
 namespace Drone.Lib.Compilers
 {
 	public class CSharpCompiler
 	{
-		private static readonly string NormalErrorPattern = @"(?<file>.*)\((?<line>\d+),(?<column>\d+)\):\s+(?<error>\w+)\s+(?<number>[\d\w]+):\s+(?<message>.*)";
-		private static readonly string GeneralErrorPattern = @"(?<error>.+?)\s+(?<number>[\d\w]+?):\s+(?<message>.*)";
-
-		private static readonly Regex NormalErrorRegex = new Regex(NormalErrorPattern, RegexOptions.Compiled);
-		private static readonly Regex GeneralErrorRegex = new Regex(GeneralErrorPattern, RegexOptions.Compiled);
-
 		private static readonly string ReferenceSwitch = "/r:";
 		private static readonly string OutputSwitch = "/out:";
 		private static readonly string OptimizeSwitch = "/optimize";
@@ -41,7 +33,6 @@ namespace Drone.Lib.Compilers
 			if (args == null)
 				throw new ArgumentNullException("args");
 
-			var consoleApp = null as ConsoleApp;
 			var command = string.Empty;
 			var commandArgs = string.Empty;
 			var sw = new Stopwatch();
@@ -59,30 +50,29 @@ namespace Drone.Lib.Compilers
 				var responseFileText = this.GetCompilerArgString(args);
 				File.WriteAllText(responseFilename, responseFileText);
 
-				consoleApp = new ConsoleApp(command, commandArgs);
-				consoleApp.ConsoleOutput += App_OnConsoleOutput;
-				
-				consoleApp.Run();
-				consoleApp.WaitForExit();
+				var processResult = null as ProcessRunnerResult;
 
-				var method = typeof(ConsoleApp).GetMethod("DispatchProcessOutput", BindingFlags.Instance | BindingFlags.NonPublic);
+				using(var processRunner = new ProcessRunner(command, commandArgs))
+				{
+					processRunner.ProcessOutputRecevied += this.Process_OnOutputReceived;
+					processRunner.Start();
+					processResult = processRunner.WaitForExit();
+				}
 
-				method.Invoke(consoleApp, null);
-				
-				if(consoleApp.ExitCode == null)
-					throw ConsoleAppUnableToGetExitCodeException.Get(command, commandArgs);
+				if(processResult == null)
+					throw new InvalidOperationException("wait for exit returned null");
 
-				var exitCode = consoleApp.ExitCode.Value;
+				var exitCode = processResult.ExitCode;
 
 				var isSuccess = exitCode == 0 && this.errorTextLines.Count == 0;
 
-				var result = null as CSharpCompilerResult;
+				var compilerResult = null as CSharpCompilerResult;
 
 				sw.Stop();
 
 				if (isSuccess)
 				{
-					result = CSharpCompilerResult.GetSuccess(exitCode,
+					compilerResult = CSharpCompilerResult.GetSuccess(exitCode,
 						sw.Elapsed,
 						this.outputTextLines,
 						this.warningTextLines,
@@ -90,7 +80,7 @@ namespace Drone.Lib.Compilers
 				}
 				else
 				{
-					result = CSharpCompilerResult.GetFailure(exitCode,
+					compilerResult = CSharpCompilerResult.GetFailure(exitCode,
 						sw.Elapsed,
 						null,
 						this.outputTextLines,
@@ -98,7 +88,7 @@ namespace Drone.Lib.Compilers
 						this.errorTextLines);
 				}
 
-				return result;
+				return compilerResult;
 			}
 			catch (Exception ex)
 			{
@@ -106,9 +96,6 @@ namespace Drone.Lib.Compilers
 			}
 			finally
 			{
-				if (consoleApp != null)
-					consoleApp.ConsoleOutput -= App_OnConsoleOutput;
-
 				if(File.Exists(responseFilename))
 				{
 					try
@@ -127,40 +114,33 @@ namespace Drone.Lib.Compilers
 			}
 		}
 
-		private void App_OnConsoleOutput(object sender, ConsoleOutputEventArgs e)
+		private void Process_OnOutputReceived(object sender, ProcessRunnerOutputReceivedEventArgs e)
 		{
-			if(string.IsNullOrWhiteSpace(e.Line))
+			if (string.IsNullOrWhiteSpace(e.Data))
 				return;
 
-			if(e.IsError)
+			if (e.IsError)
 			{
-				this.errorTextLines.Add(e.Line);
-				return;
-			}
-			
-			var match = NormalErrorRegex.Match(e.Line);
-
-			if(!match.Success)
-			{
-				match = GeneralErrorRegex.Match(e.Line);
-			}
-
-			if(match.Success)
-			{
-				var category = match.Groups["error"].Value;
-
-				if (category == "warning")
-				{
-					this.warningTextLines.Add(e.Line);
-				}
-				else if (category == "error")
-				{
-					this.errorTextLines.Add(e.Line);
-				}
+				this.errorTextLines.Add(e.Data);
 			}
 			else
 			{
-				this.outputTextLines.Add(e.Line);
+				var level = MSBuildHelper.GetOutputLevel(e.Data);
+
+				switch(level)
+				{
+					case MSBuildOutputLevel.Normal:
+						this.outputTextLines.Add(e.Data);
+						break;
+
+					case MSBuildOutputLevel.Error:
+						this.errorTextLines.Add(e.Data);
+						break;
+
+					case MSBuildOutputLevel.Warning:
+						this.warningTextLines.Add(e.Data);
+						break;
+				}
 			}
 		}
 

@@ -28,7 +28,7 @@ namespace Drone.App.Core
 
 		public static InvalidLogLevelStringException Get(string str)
 		{
-			var msg = "invalid log level string. expected any of the following: off, fatal, error, warn, info, debug, trace";
+			var msg = "invalid log level string. expected any of the following: off, fatal, error|err, warn, info, debug, trace";
 
 			var ex = new InvalidLogLevelStringException(msg);
 			ex.Data["is-string-null-or-empty"] = string.IsNullOrWhiteSpace(str);

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Drone.Lib.Compilers
+namespace Drone.Lib.DotNet
 {
 	public class DotNetFramework
 	{

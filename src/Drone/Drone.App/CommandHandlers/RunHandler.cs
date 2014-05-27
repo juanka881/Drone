@@ -5,6 +5,8 @@ using System.Text;
 using Drone.App.Core;
 using Drone.Lib;
 using Drone.Lib.Core;
+using Drone.Lib.Helpers;
+using NLog;
 
 namespace Drone.App.CommandHandlers
 {
@@ -18,7 +20,7 @@ namespace Drone.App.CommandHandlers
 
 			DroneConfig.Current = config;
 
-			var module = this.CompileAndLoadModule(config);
+			var module = this.CompileAndLoadModule(config, LogLevel.Debug);
 
 			var taskNames = tokens.Where(x => !x.Value.StartsWith("-")).Select(x => x.Value);
 

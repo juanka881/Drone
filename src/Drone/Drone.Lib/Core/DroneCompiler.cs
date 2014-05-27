@@ -156,7 +156,7 @@ namespace Drone.Lib.Core
 			}
 		}
 
-		public void Compile(DroneConfig config)
+		public void Compile(DroneConfig config, LogLevel logLevel)
 		{
 			if (this.NeedsRecompile(config))
 			{
@@ -166,7 +166,7 @@ namespace Drone.Lib.Core
 				{
 					if (result.IsSuccess)
 					{
-						this.Log.Info("compiled ({0})", HumanTime.Format(result.TimeElapsed));
+						this.Log.Log(logLevel, "compiled ({0})", HumanTime.Format(result.TimeElapsed));
 					}
 					else
 					{
@@ -180,10 +180,8 @@ namespace Drone.Lib.Core
 			}
 			else
 			{
-				this.Log.Info("compiliation skipped, all files up to date");
+				this.Log.Log(logLevel, "compiliation skipped, all files up to date");
 			}
-
-			this.Log.Info(string.Empty);
 		}
 
 		public void LogResult(CSharpCompilerResult result)

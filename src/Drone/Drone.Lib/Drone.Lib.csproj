@@ -52,6 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compilers\MSBuildHelper.cs" />
+    <Compile Include="Compilers\MSBuildOutputLevel.cs" />
     <Compile Include="Core\AutofacDroneTaskHandlerFactory.cs" />
     <Compile Include="Core\DroneActionTaskHandler.cs" />
     <Compile Include="Core\DroneCreateMainModuleFailedException.cs" />
@@ -64,10 +66,13 @@
     <Compile Include="DroneTaskHandler.cs" />
     <Compile Include="Core\DroneTaskHandlerFactory.cs" />
     <Compile Include="Core\DroneTaskHandlerNotFoundException.cs" />
-    <Compile Include="Core\Option.cs" />
-    <Compile Include="Core\OptionExtensions.cs" />
-    <Compile Include="Core\StringTokenType.cs" />
-    <Compile Include="Core\StringTokenSet.cs" />
+    <Compile Include="FileSystem\DirectoryMetadata.cs" />
+    <Compile Include="FileSystem\FileMetadata.cs" />
+    <Compile Include="Helpers\ProcessRunner.cs" />
+    <Compile Include="Helpers\ProcessRunnerOutputReceivedEventArgs.cs" />
+    <Compile Include="Helpers\ProcessRunnerResult.cs" />
+    <Compile Include="Helpers\StringTokenType.cs" />
+    <Compile Include="Helpers\StringTokenSet.cs" />
     <Compile Include="Core\DroneCompiler.cs" />
     <Compile Include="Core\DroneCompilerException.cs" />
     <Compile Include="Core\DroneCompileStatus.cs" />
@@ -79,11 +84,11 @@
     <Compile Include="Compilers\CSharpCompiler.cs" />
     <Compile Include="Compilers\CSharpCompilerArgs.cs" />
     <Compile Include="Compilers\CSharpCompilerResult.cs" />
-    <Compile Include="Compilers\DotNetFramework.cs" />
-    <Compile Include="Core\FuncStopwatch.cs" />
-    <Compile Include="Core\FuncStopwatchResult.cs" />
-    <Compile Include="Core\LogHelper.cs" />
-    <Compile Include="Core\StringToken.cs" />
+    <Compile Include="DotNet\DotNetFramework.cs" />
+    <Compile Include="Helpers\FuncStopwatch.cs" />
+    <Compile Include="Helpers\FuncStopwatchResult.cs" />
+    <Compile Include="Core\DroneLogHelper.cs" />
+    <Compile Include="Helpers\StringToken.cs" />
     <Compile Include="Core\DroneActionTask.cs" />
     <Compile Include="Core\DroneDependencyOnlyTask.cs" />
     <Compile Include="DroneModuleExtensions.cs" />
@@ -108,14 +113,24 @@
     <Compile Include="Helpers\ExceptionExtensions.cs" />
     <Compile Include="Helpers\HumanTime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Core\StringTokenizer.cs" />
+    <Compile Include="Helpers\StringTokenizer.cs" />
+    <Compile Include="Tasks\CleanTask.cs" />
+    <Compile Include="Tasks\CleanTaskHandler.cs" />
+    <Compile Include="Tasks\CopyFileTask.cs" />
+    <Compile Include="Tasks\CopyFileTaskHanlder.cs" />
+    <Compile Include="Tasks\MSBuildTask.cs" />
+    <Compile Include="Tasks\MSBuildTaskHandler.cs" />
+    <Compile Include="Tasks\MSBuildVerbosity.cs" />
+    <Compile Include="Tasks\RunProcessTask.cs" />
+    <Compile Include="Tasks\RunProcessTaskHandler.cs" />
+    <Compile Include="Tasks\RunProcessTaskResult.cs" />
+    <Compile Include="VSProjects\CSharpProjectFile.cs" />
+    <Compile Include="VSProjects\VSProject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tasks\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Drone.Lib.Configs;
 using Drone.Lib.Core;
+using Drone.Lib.Helpers;
 using NLog;
 using Drone.Lib;
 
@@ -38,9 +39,9 @@ namespace Drone.App.Core
 			return this.Repo.Load(this.Flags.ConfigFilename);
 		}
 
-		protected DroneModule CompileAndLoadModule(DroneConfig config)
+		protected DroneModule CompileAndLoadModule(DroneConfig config, LogLevel logLevel)
 		{
-			this.Compiler.Compile(config);
+			this.Compiler.Compile(config, logLevel);
 
 			var module = this.Loader.Load(config);
 			

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Drone.App.Core;
 using Drone.Lib.Core;
+using Drone.Lib.Helpers;
+using NLog;
 
 namespace Drone.App.CommandHandlers
 {
@@ -11,7 +13,7 @@ namespace Drone.App.CommandHandlers
 		public override void Handle(StringTokenSet tokens)
 		{
 			var config = this.LoadConfig();
-			var module = this.CompileAndLoadModule(config);
+			var module = this.CompileAndLoadModule(config, LogLevel.Debug);
 			var taskCounter = 0;
 
 			this.Log.Info("tasks:");

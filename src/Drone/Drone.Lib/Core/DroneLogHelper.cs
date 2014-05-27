@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Drone.Lib.Core
 {
-	public static class LogHelper
+	public static class DroneLogHelper
 	{
 		public static readonly string LogName = "drone";
 

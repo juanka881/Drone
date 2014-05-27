@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Drone.Lib.Core
+namespace Drone.Lib.Helpers
 {
 	public enum StringTokenType
 	{
