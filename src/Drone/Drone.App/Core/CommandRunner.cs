@@ -11,6 +11,7 @@ using NLog;
 using Autofac;
 using NLog.Config;
 using NLog.Targets;
+using System.IO;
 
 namespace Drone.App.Core
 {
@@ -143,6 +144,17 @@ namespace Drone.App.Core
 			
 			if(flags.IsConsoleLogColorsDisabled)
 				this.DisableConsoleLogColors(rules);
+
+			var errorFileTarget = (from target in LogManager.Configuration.AllTargets
+								   where target.Name == "drone.error.file" && target is FileTarget
+								   select target as FileTarget).FirstOrDefault();
+
+			if(errorFileTarget != null)
+			{
+				var configPath = Path.GetFullPath(flags.ConfigFilename);
+				var configDir = Path.GetDirectoryName(configPath);
+				errorFileTarget.FileName = Path.Combine(configDir, "drone.errors.txt");
+			}
 
 			LogManager.ReconfigExistingLoggers();
 		}

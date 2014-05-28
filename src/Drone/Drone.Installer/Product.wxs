@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="7A638BB8-6B26-4615-939D-7E6F82BDAB32" 
+			 Name="Drone" 
+			 Language="1033" 
+			 Version="0.1.0" 
+			 Manufacturer="Juan Carlos Bravo" 
+			 UpgradeCode="a576416c-1e77-4177-880f-4a81db2a7c59">
+		
+		<Package InstallerVersion="200" 
+				 Compressed="yes" 
+				 InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+		<Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" 
+				 Title="Drone" 
+				 Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="Drone" />
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<Component Id="ProductComponent" Guid="94D34499-C223-468A-8484-4C05F6101B12">
+				
+				<!-- project files -->
+				<File Id="Drone.exe" Name="$(var.Drone.App.TargetFileName)" Source="$(var.Drone.App.TargetPath)" />
+				<File Id="Drone.exe.config" Name="$(var.Drone.App.TargetFileName).config" Source="$(var.Drone.App.TargetDir)$(var.Drone.App.TargetFileName).config" />
+				<File Id="Drone.Lib.dll" Name="$(var.Drone.Lib.TargetFileName)" Source="$(var.Drone.Lib.TargetPath)" />
+				
+				<!-- external libs -->
+				<File Id="Autofac.dll" Name="Autofac.dll" Source="$(var.Drone.App.TargetDir)Autofac.dll" />
+				<File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.Drone.App.TargetDir)Newtonsoft.Json.dll" />
+				<File Id="NLog.dll" Name="NLog.dll" Source="$(var.Drone.App.TargetDir)NLog.dll" />
+				
+				<!-- include in command line path -->
+				<Environment Id="PATH" Name="PATH" Value="[INSTALLFOLDER]" Permanent="no" Part="last" Action="set" System="yes" />
+			 </Component> 
+		</ComponentGroup>
+	</Fragment>
+</Wix>
