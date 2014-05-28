@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NLog;
 
-namespace Drone.App.Core
+namespace Drone.Lib
 {
 	public class DroneFlags
 	{

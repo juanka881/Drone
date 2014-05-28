@@ -7,10 +7,12 @@ namespace Drone.Lib.Compilers
 {
 	public class CSharpCompilerArgs
 	{
-		public string WorkDir { get; private set; }
-		public string OutputFilepath { get; private set; }
-		public IList<string> SourceFiles { get; private set; }
-		public IList<string> ReferenceFiles { get; private set; }
+		public string WorkDir { get; set; }
+		public string OutputFilepath { get; set; }
+		public IList<string> SourceFiles { get; set; }
+		public IList<string> ReferenceFiles { get; set; }
+		public bool Optimize { get; set; }
+		public bool Debug { get; set; }
 
 		public CSharpCompilerArgs(
 			string workDir,

@@ -76,6 +76,17 @@ namespace Drone.Lib.Core
 					sourceFiles,
 					referenceFiles);
 
+				if(DroneFlags.Current != null && DroneFlags.Current.IsDebugEnabled)
+				{
+					args.Debug = true;
+					args.Optimize = false;
+				}
+				else
+				{
+					args.Debug = false;
+					args.Optimize = true;
+				}
+
 				if (this.Log.IsDebugEnabled)
 				{
 					this.Log.Debug("csharp args");

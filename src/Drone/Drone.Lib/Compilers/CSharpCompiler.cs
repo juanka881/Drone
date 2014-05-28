@@ -14,6 +14,7 @@ namespace Drone.Lib.Compilers
 		private static readonly string ReferenceSwitch = "/r:";
 		private static readonly string OutputSwitch = "/out:";
 		private static readonly string OptimizeSwitch = "/optimize";
+		private static readonly string DebugSwitch = "/debug";
 		private static readonly string TargetSwitch = "/target:library";
 		private static readonly string NoLogoSwitch = "/nologo";
 
@@ -159,9 +160,22 @@ namespace Drone.Lib.Compilers
 				.AppendLine()
 				.Append(TargetSwitch)
 				.AppendLine()
-				.Append(OptimizeSwitch)
-				.AppendLine()
-				.Append(NoLogoSwitch);
+				.Append(NoLogoSwitch)
+				.AppendLine();
+
+			if(args.Optimize)
+			{
+				sb.Append(OptimizeSwitch)
+					.Append(args.Optimize ? "+" : "-")
+					.AppendLine();
+			}
+
+			if(args.Debug)
+			{
+				sb.Append(DebugSwitch)
+					.Append(args.Debug ? "+" : "-")
+					.AppendLine();
+			}
 
 			if (!string.IsNullOrWhiteSpace(referenceFiles))
 				sb.AppendLine().Append(referenceFiles);

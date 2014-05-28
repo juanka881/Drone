@@ -180,6 +180,8 @@ namespace Drone.App.Core
 				var tokens = this.GetTokens(commandString);
 				var flags = this.GetFlags(tokens);
 
+				DroneFlags.Current = flags;
+
 				this.ApplyLogConfig(flags);
 
 				handler = this.GetHandler(tokens);
