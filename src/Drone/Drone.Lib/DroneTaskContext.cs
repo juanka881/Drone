@@ -50,12 +50,20 @@ namespace Drone.Lib
 
 		public void Run(DroneTask task)
 		{
+			if (task == null)
+				throw new ArgumentNullException("task");
+
 			this.runTask(task, this.Config);
 		}
 
 		public void Run(string taskName)
 		{
-			this.Run(this.Module.TryGetTask(taskName));
+			var task = this.Module.TryGetTask(taskName);
+
+			if (task == null)
+				throw DroneTasksNotFoundException.Get(Enumerable.Repeat(taskName, 1));
+
+			this.Run(task);
 		}
 
 		public void Fail(string message = null, Exception ex = null)
