@@ -63,6 +63,16 @@ namespace Drone.Lib
 					taskName = string.Format("{0}/{1}", ns, task.Name);
 
 				var newTask = task.Clone(taskName);
+
+				var deps = new List<string>(newTask.Dependencies);
+				newTask.Dependencies.Clear();
+
+				foreach (var dep in deps)
+				{
+					var depName = string.Format("{0}/{1}", ns, dep);
+					newTask.Dependencies.Add(depName);
+				}
+
 				this.Add(newTask);
 			}
 		}
