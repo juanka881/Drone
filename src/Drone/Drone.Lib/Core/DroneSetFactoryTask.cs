@@ -8,6 +8,11 @@ namespace Drone.Lib.Core
 	{
 		public Func<DroneTaskContext, IEnumerable<DroneTask>> Factory { get; private set; }
 
+		public DroneSetFactoryTask()
+		{
+			
+		}
+
 		public DroneSetFactoryTask(string name, IEnumerable<string> deps, Func<DroneTaskContext, IEnumerable<DroneTask>> factory)
 			: base(name, deps)
 		{
