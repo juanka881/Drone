@@ -35,12 +35,17 @@ namespace Drone.Lib
 			
 		}
 
-		public virtual DroneTask Clone(string newName)
+		public DroneTask CloneCore(string newName)
 		{
 			var task = Activator.CreateInstance(this.GetType()) as DroneTask;
 			task.Name = newName;
 			task.Dependencies.AddMany(this.Dependencies);
 			return task;
+		}
+
+		public virtual DroneTask Clone(string newName)
+		{
+			return this.CloneCore(newName);
 		}
 	}
 }
