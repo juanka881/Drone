@@ -8,6 +8,11 @@ namespace Drone.Lib.Core
 	{
 		public Action<DroneTaskContext> Action { get; private set; }
 
+		public DroneActionTask()
+		{
+			
+		}
+
 		public DroneActionTask(string name, IEnumerable<string> deps, Action<DroneTaskContext> action) 
 			: base(name, deps)
 		{
