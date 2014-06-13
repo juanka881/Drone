@@ -7,8 +7,6 @@ namespace Drone.Lib
 {
 	public class DroneFlags
 	{
-		public static DroneFlags Current { get; set; }
-
 		public string ConfigFilename { get; set; }
 
 		public bool IsDebugEnabled { get; set; }

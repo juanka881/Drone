@@ -17,8 +17,6 @@ namespace Drone.Lib
 
 		public static readonly string AssemblyFilename = "drone.user.dll";
 
-		public static DroneConfig Current;
-
 		[JsonIgnore]
 		public string HashId { get; private set; }
 

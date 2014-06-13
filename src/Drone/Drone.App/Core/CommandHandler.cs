@@ -22,6 +22,8 @@ namespace Drone.App.Core
 
 		public DroneFlags Flags { get; set; }
 
+		public DroneConfig Config { get; set; }
+
 		public abstract void Handle(StringTokenSet tokens);
 
 		protected CommandHandler()
@@ -32,11 +34,6 @@ namespace Drone.App.Core
 		protected void SaveConfig(DroneConfig config)
 		{
 			this.Repo.Save(config);
-		}
-
-		protected DroneConfig LoadConfig()
-		{
-			return this.Repo.Load(this.Flags.ConfigFilename);
 		}
 
 		protected DroneModule CompileAndLoadModule(DroneConfig config, LogLevel logLevel)

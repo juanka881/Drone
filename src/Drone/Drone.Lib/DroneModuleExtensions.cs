@@ -36,6 +36,9 @@ namespace Drone.Lib
 			if(module == null)
 				throw new ArgumentNullException("module");
 
+			if(deps == null)
+				throw new ArgumentNullException("deps");
+
 			module.Add(new DroneDependencyOnlyTask(name, deps));
 		}
 

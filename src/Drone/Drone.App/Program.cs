@@ -13,7 +13,17 @@ namespace Drone.App
 		{
 			if (args.Any(x => x == "-d"))
 			{
-				while (!Debugger.IsAttached) { }
+				Console.WriteLine("waiting for debugger...");
+				var sw = new Stopwatch();
+				sw.Start();
+				while(!Debugger.IsAttached)
+				{
+					if(sw.Elapsed > TimeSpan.FromSeconds(30))
+					{
+						Console.WriteLine("waiting for debugger timeout");
+						return;
+					}
+				}
 			}
 
 			var runner = new CommandRunner();

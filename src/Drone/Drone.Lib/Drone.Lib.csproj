@@ -59,6 +59,7 @@
     <Compile Include="Core\DroneFactoryTaskHandler.cs" />
     <Compile Include="Core\DroneSetFactoryTask.cs" />
     <Compile Include="Core\DroneSetFactoryTaskHandler.cs" />
+    <Compile Include="DroneContext.cs" />
     <Compile Include="DroneFlags.cs" />
     <Compile Include="DroneTaskExtensions.cs" />
     <Compile Include="DroneTaskHandler.cs" />

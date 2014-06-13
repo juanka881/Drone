@@ -76,7 +76,7 @@ namespace Drone.Lib.Core
 					sourceFiles,
 					referenceFiles);
 
-				if(DroneFlags.Current != null && DroneFlags.Current.IsDebugEnabled)
+				if (DroneContext.Flags != null && DroneContext.Flags.IsDebugEnabled)
 				{
 					args.Debug = true;
 					args.Optimize = false;

@@ -36,7 +36,7 @@ namespace Drone.App.CommandHandlers
 				return;
 			}
 
-			var config = this.LoadConfig();
+			var config = this.Config;
 
 			var sourcesRemoved = sources
 				.Where(x => config.SourceFiles.Remove(x))

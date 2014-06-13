@@ -12,8 +12,7 @@ namespace Drone.App.CommandHandlers
 	{
 		public override void Handle(StringTokenSet tokens)
 		{
-			var config = this.LoadConfig();
-			this.Compiler.Compile(config, LogLevel.Info);
+			this.Compiler.Compile(this.Config, LogLevel.Info);
 		}
 	}
 }

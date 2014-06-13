@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Drone.App.Core;
-using Drone.Lib.Core;
 using Drone.Lib.Helpers;
 
 namespace Drone.App.CommandHandlers
@@ -34,7 +33,7 @@ namespace Drone.App.CommandHandlers
 				return;
 			}
 
-			var config = this.LoadConfig();
+			var config = this.Config;
 
 			var sourcesToAdd = sources.Except(config.SourceFiles).ToList();
 

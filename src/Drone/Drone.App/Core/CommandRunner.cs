@@ -121,6 +121,13 @@ namespace Drone.App.Core
 			return flags;
 		}
 
+		private DroneConfig GetConfig(string configFilename)
+		{
+			var repo = this.container.Resolve<DroneConfigRepo>();
+			var config = repo.Load(configFilename);
+			return config;
+		}
+
 		private void ApplyLogConfig(DroneFlags flags)
 		{
 			if(flags == null)
@@ -191,8 +198,10 @@ namespace Drone.App.Core
 
 				var tokens = this.GetTokens(commandString);
 				var flags = this.GetFlags(tokens);
+				var config = this.GetConfig(flags.ConfigFilename);
 
-				DroneFlags.Current = flags;
+				DroneContext.Config = config;
+				DroneContext.Flags = flags;
 
 				this.ApplyLogConfig(flags);
 
