@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -12,14 +13,17 @@ namespace Drone.Lib.Helpers
 	public class ProcessRunner : IDisposable
 	{
 		private bool isDisposed;
-		private Process process;
-		private AutoResetEvent processEvent;
-		private ConcurrentQueue<ProcessRunnerOutputReceivedEventArgs> processOutputReceivedQueue;
-		private Task processMonitorTask;
-		private CancellationTokenSource processCancellationTokenSource;
 		private bool isRunning;
-		private bool processOutputReadlineStarted;
-		private bool processErrorReadlineStarted;
+		private Process process;
+
+		private Task processReadStandardOutputTask;
+		private Task processReadStandardErrorTask;
+		private Task processDispatchOutputEventsTask;
+		private CancellationTokenSource processReadStandardOutputTokenSource;
+		private CancellationTokenSource processReadStandardErrorTokenSource;
+		private CancellationTokenSource processDispatchOutputEventsTokenSource;
+		private ConcurrentQueue<ProcessRunnerOutputReceivedEventArgs> processOutputQueue;
+		
 		private int exitCode;
 		private DateTime exitTimestamp;
 
@@ -37,14 +41,17 @@ namespace Drone.Lib.Helpers
 			this.filename = filename;
 			this.commandLine = commandLine;
 			this.workDir = workDir;
+			this.processOutputQueue = new ConcurrentQueue<ProcessRunnerOutputReceivedEventArgs>();
 		}
 
 		public event ProcessRunnerOutputReceivedEventHandler ProcessOutputRecevied;
 
 		public event EventHandler ProcessExited;
 
-		public void NotifyProcessOutputReceived(ProcessRunnerOutputReceivedEventArgs e)
+		private void NotifyProcessOutputReceived(ProcessRunnerOutputReceivedEventArgs e)
 		{
+			this.CheckIsDisposed();
+
 			var handler = this.ProcessOutputRecevied;
 
 			if(handler == null)
@@ -53,8 +60,10 @@ namespace Drone.Lib.Helpers
 			handler(this, e);
 		}
 
-		public void NotifyProcessExited()
+		private void NotifyProcessExited()
 		{
+			this.CheckIsDisposed();
+
 			var handler = this.ProcessExited;
 
 			if (handler == null)
@@ -84,14 +93,34 @@ namespace Drone.Lib.Helpers
 			if(this.process == null)
 				return null;
 
-			if(!this.process.WaitForExit((int) ts.TotalMilliseconds))
+			var hasProcessExited = this.process.WaitForExit((int) ts.TotalMilliseconds);
+
+			if(!hasProcessExited)
 				return null;
 
-			if(!this.processMonitorTask.IsCompleted)
-			{
-				if(!this.processMonitorTask.Wait((int) ts.TotalMilliseconds))
-					return null;
-			}
+			this.processReadStandardOutputTask.Wait(ts);
+
+			var hasReadStandardOutputTaskEnded = this.processReadStandardOutputTask != null &&
+												 this.processReadStandardOutputTask.IsCompleted;
+
+			if(!hasReadStandardOutputTaskEnded)
+				return null;
+
+			this.processReadStandardErrorTask.Wait(ts);
+
+			var hasReadStandardErrorTaskEnded = this.processReadStandardErrorTask != null &&
+												this.processReadStandardErrorTask.IsCompleted;
+
+			if(!hasReadStandardErrorTaskEnded)
+				return null;
+
+			this.processDispatchOutputEventsTask.Wait(ts);
+
+			var hasDispatchOutputTaskEnded = this.processDispatchOutputEventsTask != null &&
+											 this.processDispatchOutputEventsTask.IsCompleted;
+
+			if (!hasDispatchOutputTaskEnded)
+				return null;
 
 			return new ProcessRunnerResult(this.exitTimestamp, this.exitCode);
 		}
@@ -122,132 +151,142 @@ namespace Drone.Lib.Helpers
 				if(this.workDir != null)
 					psi.WorkingDirectory = this.workDir;
 
-				this.processEvent = new AutoResetEvent(false);
-				this.processOutputReceivedQueue = new ConcurrentQueue<ProcessRunnerOutputReceivedEventArgs>();
+				this.processReadStandardOutputTokenSource = new CancellationTokenSource();
 
-				this.processCancellationTokenSource = new CancellationTokenSource();
-				var processCancellationToken = this.processCancellationTokenSource.Token;
+				this.processReadStandardOutputTask = new Task(
+					this.ProcessReadStandardOutputTaskCore, 
+					this.processReadStandardOutputTokenSource.Token,
+					TaskCreationOptions.LongRunning);
 
-				this.processMonitorTask = new Task(this.ProcessMonitorTaskCore, processCancellationToken, TaskCreationOptions.LongRunning);
-				this.processMonitorTask.Start();
+				this.processReadStandardErrorTokenSource = new CancellationTokenSource();
 
-				this.process.OutputDataReceived += Process_OnOutputDataReceived;
-				this.process.ErrorDataReceived += Process_OnErrorDataReceived;
+				this.processReadStandardErrorTask = new Task(
+					this.ProcessReadStandardErrorTaskCore, 
+					this.processReadStandardErrorTokenSource.Token,
+					TaskCreationOptions.LongRunning);
+
+				this.processDispatchOutputEventsTokenSource = new CancellationTokenSource();
+				this.processDispatchOutputEventsTask = new Task(
+					this.ProcessDispatchOutputEventsTaskCore,
+					this.processDispatchOutputEventsTokenSource.Token,
+					TaskCreationOptions.LongRunning);
+
 				this.process.Exited += Process_OnExited;
 
 				this.process.Start();
 
-				this.process.BeginOutputReadLine();
-				this.processOutputReadlineStarted = true;
-
-				this.process.BeginErrorReadLine();
-				this.processErrorReadlineStarted = true;
+				this.processReadStandardOutputTask.Start();
+				this.processReadStandardErrorTask.Start();
+				this.processDispatchOutputEventsTask.Start();
 			}
 			catch(Exception)
 			{
-				this.ReleaseProcess();
+				this.Release();
 				throw;
 			}
 		}
 
-		private void ReleaseProcess()
+		private void ProcessDispatchOutputEventsTaskCore()
 		{
+			var token = this.processDispatchOutputEventsTokenSource.Token;
+
+			while(!token.IsCancellationRequested)
+			{
+				var e = null as ProcessRunnerOutputReceivedEventArgs;
+
+				if (this.processOutputQueue.TryDequeue(out e))
+					this.NotifyProcessOutputReceived(e);
+			}
+		}
+
+		private void ProcessReadStandardErrorTaskCore()
+		{
+			this.ProcessReadStreamTaskCore(this.process.StandardOutput, 
+				this.processReadStandardOutputTokenSource.Token, 
+				false);
+		}
+
+		private void ProcessReadStandardOutputTaskCore()
+		{
+			this.ProcessReadStreamTaskCore(this.process.StandardError, 
+				this.processReadStandardErrorTokenSource.Token,
+				true);
+		}
+
+		private void ProcessReadStreamTaskCore(
+			StreamReader stream, 
+			CancellationToken token, 
+			bool isErrorStream)
+		{
+			if(stream == null)
+				throw new ArgumentNullException("stream");
+
+			while(!token.IsCancellationRequested)
+			{
+				if(stream.Peek() == -1)
+					break;
+				
+				var data = stream.ReadLine();
+				this.processOutputQueue.Enqueue(new ProcessRunnerOutputReceivedEventArgs(data, isErrorStream));
+			}
+		}
+
+		private void Release()
+		{
+			if (this.processReadStandardOutputTokenSource != null)
+			{
+				this.processReadStandardOutputTokenSource.Cancel();
+				this.processReadStandardOutputTokenSource.Dispose();
+				this.processReadStandardOutputTokenSource = null;
+			}
+
+			if (this.processReadStandardOutputTask != null)
+			{
+				this.processReadStandardOutputTask.Dispose();
+				this.processReadStandardOutputTask = null;
+			}
+
+			if(this.processReadStandardErrorTokenSource != null)
+			{
+				this.processReadStandardErrorTokenSource.Cancel();
+				this.processReadStandardErrorTokenSource.Dispose();
+				this.processReadStandardErrorTokenSource = null;
+			}
+
+			if(this.processReadStandardErrorTask != null)
+			{
+				this.processReadStandardErrorTask.Dispose();
+				this.processReadStandardErrorTask = null;
+			}
+
+			if(this.processDispatchOutputEventsTokenSource != null)
+			{
+				this.processDispatchOutputEventsTokenSource.Cancel();
+				this.processDispatchOutputEventsTokenSource.Dispose();
+				this.processDispatchOutputEventsTokenSource = null;
+			}
+
+			if(this.processDispatchOutputEventsTask != null)
+			{
+				this.processDispatchOutputEventsTask.Dispose();
+				this.processDispatchOutputEventsTask = null;
+			}
+
 			if(this.process != null)
 			{
-				if(this.processOutputReadlineStarted)
-				{
-					this.processOutputReadlineStarted = false;
-					this.process.CancelOutputRead();
-				}
-
-				if(this.processErrorReadlineStarted)
-				{
-					this.processErrorReadlineStarted = false;
-					this.process.CancelErrorRead();
-				}
-
-				this.process.OutputDataReceived -= this.Process_OnOutputDataReceived;
-				this.process.ErrorDataReceived -= this.Process_OnErrorDataReceived;
 				this.process.Exited -= this.Process_OnExited;
 
 				this.process.Close();
 				this.process.Dispose();
 				this.process = null;
 			}
-
-			if(this.processEvent != null)
-			{
-				this.processEvent.Dispose();
-				this.processEvent = null;
-			}
-
-			if(this.processCancellationTokenSource != null)
-			{
-				this.processCancellationTokenSource.Dispose();
-				this.processCancellationTokenSource = null;
-			}
-
-			this.processMonitorTask = null;
 		}
 
 		private void Process_OnExited(object sender, EventArgs e)
 		{
-			this.processCancellationTokenSource.Cancel();
-			this.processEvent.Set();
-		}
-
-		private void Process_OnErrorDataReceived(object sender, DataReceivedEventArgs e)
-		{
-			this.processOutputReceivedQueue.Enqueue(new ProcessRunnerOutputReceivedEventArgs(e.Data, true));
-			this.processEvent.Set();
-		}
-
-		private void Process_OnOutputDataReceived(object sender, DataReceivedEventArgs e)
-		{
-			this.processOutputReceivedQueue.Enqueue(new ProcessRunnerOutputReceivedEventArgs(e.Data, false));
-			this.processEvent.Set();
-		}
-
-		private void ProcessMonitorTaskCore(object state)
-		{
-			var cancellationToken = (CancellationToken) state;
-			var events = new[] {this.processEvent, cancellationToken.WaitHandle};
-
-			while(!cancellationToken.IsCancellationRequested)
-			{
-				WaitHandle.WaitAny(events);
-				this.DispatchDataReceivedEvents();
-			}
-
 			this.exitCode = this.process.ExitCode;
 			this.exitTimestamp = this.process.ExitTime;
-
-			this.DispatchDataReceivedEvents();
-
-			try
-			{
-				this.NotifyProcessExited();
-			}
-			catch(Exception)
-			{
-				
-			}
-		}
-
-		private void DispatchDataReceivedEvents()
-		{
-			var e = null as ProcessRunnerOutputReceivedEventArgs;
-			while(this.processOutputReceivedQueue.TryDequeue(out e))
-			{
-				try
-				{
-					this.NotifyProcessOutputReceived(e);
-				}
-				catch(Exception)
-				{
-					
-				}
-			}
+			this.NotifyProcessExited();
 		}
 
 		private void CheckIsDisposed()
@@ -269,7 +308,7 @@ namespace Drone.Lib.Helpers
 			if(!disposing)
 				return;
 
-			ReleaseProcess();
+			this.Release();
 
 			this.ProcessOutputRecevied = null;
 			this.ProcessExited = null;
