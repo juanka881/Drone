@@ -28,5 +28,15 @@ namespace Drone.Lib.Tasks
 		{
 			this.OutputLogLevel = LogLevel.Info;
 		}
+
+		public override DroneTask Clone(string newName)
+		{
+			return this.Clone(newName, x =>
+			{
+				x.Filename = this.Filename;
+				x.Args = this.Args;
+				x.WorkDir = this.WorkDir;
+			});
+		}
 	}
 }

@@ -32,8 +32,9 @@ namespace Drone.Lib.Helpers
 		private readonly string filename;
 		private readonly string commandLine;
 		private readonly string workDir;
+		private readonly bool redirectStreams;
 
-		public ProcessRunner(string filename, string commandLine, string workDir = null)
+		public ProcessRunner(string filename, string commandLine, string workDir = null, bool redirectStreams = false)
 		{
 			if(string.IsNullOrWhiteSpace(filename))
 				throw new ArgumentException("filename is empty or null", "filename");
@@ -41,6 +42,7 @@ namespace Drone.Lib.Helpers
 			this.filename = filename;
 			this.commandLine = commandLine;
 			this.workDir = workDir;
+			this.redirectStreams = redirectStreams;
 			this.processOutputQueue = new ConcurrentQueue<ProcessRunnerOutputReceivedEventArgs>();
 		}
 
@@ -143,41 +145,47 @@ namespace Drone.Lib.Helpers
 				psi.FileName = this.filename;
 				psi.Arguments = this.commandLine;
 				psi.CreateNoWindow = true;
-				psi.RedirectStandardError = true;
-				psi.RedirectStandardInput = true;
-				psi.RedirectStandardOutput = true;
+				psi.RedirectStandardError = this.redirectStreams;
+				psi.RedirectStandardInput = this.redirectStreams;
+				psi.RedirectStandardOutput = this.redirectStreams;
 				psi.UseShellExecute = false;
 
 				if(this.workDir != null)
 					psi.WorkingDirectory = this.workDir;
 
-				this.processReadStandardOutputTokenSource = new CancellationTokenSource();
+				if(this.redirectStreams)
+				{
+					this.processReadStandardOutputTokenSource = new CancellationTokenSource();
 
-				this.processReadStandardOutputTask = new Task(
-					this.ProcessReadStandardOutputTaskCore, 
-					this.processReadStandardOutputTokenSource.Token,
-					TaskCreationOptions.LongRunning);
+					this.processReadStandardOutputTask = new Task(
+						this.ProcessReadStandardOutputTaskCore,
+						this.processReadStandardOutputTokenSource.Token,
+						TaskCreationOptions.LongRunning);
 
-				this.processReadStandardErrorTokenSource = new CancellationTokenSource();
+					this.processReadStandardErrorTokenSource = new CancellationTokenSource();
 
-				this.processReadStandardErrorTask = new Task(
-					this.ProcessReadStandardErrorTaskCore, 
-					this.processReadStandardErrorTokenSource.Token,
-					TaskCreationOptions.LongRunning);
+					this.processReadStandardErrorTask = new Task(
+						this.ProcessReadStandardErrorTaskCore,
+						this.processReadStandardErrorTokenSource.Token,
+						TaskCreationOptions.LongRunning);
 
-				this.processDispatchOutputEventsTokenSource = new CancellationTokenSource();
-				this.processDispatchOutputEventsTask = new Task(
-					this.ProcessDispatchOutputEventsTaskCore,
-					this.processDispatchOutputEventsTokenSource.Token,
-					TaskCreationOptions.LongRunning);
+					this.processDispatchOutputEventsTokenSource = new CancellationTokenSource();
+					this.processDispatchOutputEventsTask = new Task(
+						this.ProcessDispatchOutputEventsTaskCore,
+						this.processDispatchOutputEventsTokenSource.Token,
+						TaskCreationOptions.LongRunning);
+				}
 
 				this.process.Exited += Process_OnExited;
 
 				this.process.Start();
 
-				this.processReadStandardOutputTask.Start();
-				this.processReadStandardErrorTask.Start();
-				this.processDispatchOutputEventsTask.Start();
+				if(this.redirectStreams)
+				{
+					this.processReadStandardOutputTask.Start();
+					this.processReadStandardErrorTask.Start();
+					this.processDispatchOutputEventsTask.Start();	
+				}
 			}
 			catch(Exception)
 			{
@@ -201,14 +209,16 @@ namespace Drone.Lib.Helpers
 
 		private void ProcessReadStandardErrorTaskCore()
 		{
-			this.ProcessReadStreamTaskCore(this.process.StandardOutput, 
+			this.ProcessReadStreamTaskCore(
+				this.process.StandardOutput, 
 				this.processReadStandardOutputTokenSource.Token, 
 				false);
 		}
 
 		private void ProcessReadStandardOutputTaskCore()
 		{
-			this.ProcessReadStreamTaskCore(this.process.StandardError, 
+			this.ProcessReadStreamTaskCore(
+				this.process.StandardError, 
 				this.processReadStandardErrorTokenSource.Token,
 				true);
 		}

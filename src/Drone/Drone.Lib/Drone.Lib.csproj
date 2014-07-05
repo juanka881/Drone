@@ -123,6 +123,8 @@
     <Compile Include="Tasks\RunProcessTask.cs" />
     <Compile Include="Tasks\RunProcessTaskHandler.cs" />
     <Compile Include="Tasks\RunProcessTaskResult.cs" />
+    <Compile Include="Tasks\StartProcessTask.cs" />
+    <Compile Include="Tasks\StartProcessTaskHandler.cs" />
     <Compile Include="VSProjects\CSharpProjectFile.cs" />
     <Compile Include="VSProjects\VSProject.cs" />
   </ItemGroup>

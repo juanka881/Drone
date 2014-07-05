@@ -32,7 +32,7 @@ namespace Drone.Lib.Tasks
 				}
 
 				log.Debug("creating process runner");
-				using(var processRunner = new ProcessRunner(task.Filename, task.Args, task.WorkDir))
+				using(var processRunner = new ProcessRunner(task.Filename, task.Args, task.WorkDir, true))
 				{
 					log.Debug("starting process runner");
 					processRunner.Start();
