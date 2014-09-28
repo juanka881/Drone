@@ -12,7 +12,12 @@ namespace Drone.Lib.Core
 {
 	public class DroneCompiler
 	{
-		public Logger Log { get; set; }
+		public readonly Logger log;
+
+		public DroneCompiler()
+		{
+			this.log = DroneLogManager.GetLog();
+		}
 
 		public bool NeedsRecompile(DroneConfig config)
 		{
@@ -51,11 +56,11 @@ namespace Drone.Lib.Core
 
 				var compiler = new CSharpCompiler();
 
-				this.Log.Debug("checking if output dir exists '{0}'", config.BinDirpath);
+				this.log.Debug("checking if output dir exists '{0}'", config.BinDirpath);
 
 				if (!Directory.Exists(config.BinDirpath))
 				{
-					this.Log.Debug("output dir not found. creating output bin dir");
+					this.log.Debug("output dir not found. creating output bin dir");
 					Directory.CreateDirectory(config.BinDirpath);
 				}
 
@@ -68,7 +73,7 @@ namespace Drone.Lib.Core
 
 				var sourceFiles = this.ResolveSourceFiles(config.SourceFiles, configDirpath).ToList();
 
-				this.Log.Debug("creating csharp compiler args");
+				this.log.Debug("creating csharp compiler args");
 
 				var args = new CSharpCompilerArgs(
 					config.Dirname,
@@ -76,7 +81,7 @@ namespace Drone.Lib.Core
 					sourceFiles,
 					referenceFiles);
 
-				if (DroneContext.Flags != null && DroneContext.Flags.IsDebugEnabled)
+				if (DroneEnvironment.Flags != null && DroneEnvironment.Flags.IsDebugEnabled)
 				{
 					args.Debug = true;
 					args.Optimize = false;
@@ -87,32 +92,32 @@ namespace Drone.Lib.Core
 					args.Optimize = true;
 				}
 
-				if (this.Log.IsDebugEnabled)
+				if (this.log.IsDebugEnabled)
 				{
-					this.Log.Debug("csharp args");
-					this.Log.Debug("work dir: '{0}'", args.WorkDir);
-					this.Log.Debug("output filepath: '{0}'", args.OutputFilepath);
-					this.Log.Debug("source files:");
+					this.log.Debug("csharp args");
+					this.log.Debug("work dir: '{0}'", args.WorkDir);
+					this.log.Debug("output filepath: '{0}'", args.OutputFilepath);
+					this.log.Debug("source files:");
 
 					foreach (var file in sourceFiles)
-						this.Log.Debug(file);
+						this.log.Debug(file);
 
-					this.Log.Debug("reference files:");
+					this.log.Debug("reference files:");
 
 					foreach (var file in referenceFiles)
-						this.Log.Debug(file);
+						this.log.Debug(file);
 				}
 
-				this.Log.Debug("calling csc compiler '{0}'...", config.Filename);
+				this.log.Debug("calling csc compiler '{0}'...", config.Filename);
 
 				var result = compiler.Compile(args);
 
-				this.Log.Debug("csc result: {0}", result.IsSuccess);
-				this.Log.Debug("exit code: {0}", result.ExiteCode);
+				this.log.Debug("csc result: {0}", result.IsSuccess);
+				this.log.Debug("exit code: {0}", result.ExiteCode);
 
 				if (result.IsSuccess)
 				{
-					this.Log.Debug("output assembly filepath: '{0}'", result.Success.OutputAssemblyFilepath);
+					this.log.Debug("output assembly filepath: '{0}'", result.Success.OutputAssemblyFilepath);
 				}
 
 				return result;
@@ -177,7 +182,7 @@ namespace Drone.Lib.Core
 				{
 					if (result.IsSuccess)
 					{
-						this.Log.Log(logLevel, "compiled ({0})", HumanTime.Format(result.TimeElapsed));
+						this.log.Log(logLevel, "compiled ({0})", HumanTime.Format(result.TimeElapsed));
 					}
 					else
 					{
@@ -191,7 +196,7 @@ namespace Drone.Lib.Core
 			}
 			else
 			{
-				this.Log.Log(logLevel, "compiliation skipped, all files up to date");
+				this.log.Log(logLevel, "compiliation skipped, all files up to date");
 			}
 		}
 
@@ -201,18 +206,18 @@ namespace Drone.Lib.Core
 				throw new ArgumentNullException("result");
 
 			foreach (var line in result.OutputTextLines)
-				this.Log.Info(line);
+				this.log.Info(line);
 
 			foreach (var line in result.WarningTextLines)
-				this.Log.Warn(line);
+				this.log.Warn(line);
 
 			if (!result.IsSuccess)
 			{
 				foreach (var line in result.Failure.ErrorTextLines)
-					this.Log.Error(line);
+					this.log.Error(line);
 
 				if(result.Failure.Exception != null)
-					this.Log.ExceptionAndData(result.Failure.Exception);
+					this.log.ExceptionAndData(result.Failure.Exception);
 			}
 		}
 	}

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Drone.Lib.Configs;
 using NUnit.Framework;
 
 namespace Drone.Tests.CommandHandlers

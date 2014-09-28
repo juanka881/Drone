@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Drone.App.Core
+namespace Drone.Lib.Core
 {
 	[Serializable]
 	public class InvalidLogLevelStringException : Exception
@@ -31,6 +31,7 @@ namespace Drone.App.Core
 			var msg = "invalid log level string. expected any of the following: off, fatal, error|err, warn, info, debug, trace";
 
 			var ex = new InvalidLogLevelStringException(msg);
+
 			ex.Data["is-string-null-or-empty"] = string.IsNullOrWhiteSpace(str);
 			ex.Data["string"] = str;
 

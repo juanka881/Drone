@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Drone.Lib.Core
+namespace Drone.Lib.Tasks
 {
-	public class DroneActionTask : DroneTask
+	public class ActionTask : DroneTask
 	{
 		public Action<DroneTaskContext> Action { get; private set; }
 
-		public DroneActionTask()
+		public ActionTask()
 		{
 			
 		}
 
-		public DroneActionTask(string name, IEnumerable<string> deps, Action<DroneTaskContext> action) 
+		public ActionTask(string name, IEnumerable<string> deps, Action<DroneTaskContext> action) 
 			: base(name, deps)
 		{
 			if(action == null)

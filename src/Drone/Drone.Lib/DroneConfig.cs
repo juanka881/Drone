@@ -11,11 +11,11 @@ namespace Drone.Lib
 {
 	public class DroneConfig
 	{
-		public static readonly string DefaultFilename = "drone.config";
+		public static readonly string DefaultFilename = "drone.json";
 
-		public static readonly string BinDirname = "drone.bin";
+		public static readonly string WorkDirname = "drone-workdir";
 
-		public static readonly string AssemblyFilename = "drone.user.dll";
+		public static readonly string AssemblyFilename = "drone-user-tasks.dll";
 
 		[JsonIgnore]
 		public string HashId { get; private set; }
@@ -36,13 +36,13 @@ namespace Drone.Lib
 		public string AssemblyFilepath { get; private set; }
 
 		[JsonProperty("source-files")]
-		public IList<string> SourceFiles { get; set; }
+		public IList<string> SourceFiles { get; private set; }
 
 		[JsonProperty("reference-files")]
-		public IList<string> ReferenceFiles { get; set; }
+		public IList<string> ReferenceFiles { get; private set; }
 
 		[JsonProperty("properties")]
-		public JObject Properties { get; set; }
+		public JObject Properties { get; private set; }
 
 		public DroneConfig()
 		{
@@ -69,7 +69,7 @@ namespace Drone.Lib
 
 			this.HashId = HashHelper.GetHash(Path.GetFullPath(this.Filepath));
 			this.Dirname = Path.GetDirectoryName(this.Filepath);
-			this.BinDirpath = Path.Combine(Path.GetTempPath(), BinDirname, this.HashId);
+			this.BinDirpath = Path.Combine(Path.GetTempPath(), WorkDirname, this.HashId);
 			this.AssemblyFilepath = Path.Combine(this.BinDirpath, AssemblyFilename);
 		}
 	}

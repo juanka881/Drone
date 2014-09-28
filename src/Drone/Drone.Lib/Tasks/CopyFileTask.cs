@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Drone.Lib.FileSystem;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,21 +7,39 @@ namespace Drone.Lib.Tasks
 {
 	public class CopyFileTask : DroneTask
 	{
-		public IList<string> Sources { get; set; }
+		public FileSet Set { get; private set; }
 
-		public string Destination { get; set; }
+		public string DestinationDir { get; set; }
 
 		public CopyFileTask()
 		{
-			this.Sources = new List<string>();
+			this.Set = new FileSet();
+		}
+
+		public CopyFileTask Include(string pattern)
+		{
+			this.Set.Include(pattern);
+			return this;
+		}
+
+		public CopyFileTask Exclude(string pattern)
+		{
+			this.Set.Exclude(pattern);
+			return this;
+		}
+
+		public CopyFileTask Dest(string destDir)
+		{
+			this.DestinationDir = destDir;
+			return this;
 		}
 
 		public override DroneTask Clone(string newName)
 		{
 			return this.Clone(newName, x =>
 			{
-				x.Sources = new List<string>(this.Sources);
-				x.Destination = this.Destination;
+				x.Set = this.Set.Clone();
+				x.DestinationDir = this.DestinationDir;
 			});
 		}
 	}

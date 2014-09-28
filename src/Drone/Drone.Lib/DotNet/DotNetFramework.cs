@@ -21,8 +21,8 @@ namespace Drone.Lib.DotNet
 
 			this.Version = ver;
 			this.FrameworkDir = this.GetFrameworkDir(this.Version);
-			this.CSharpCompilerBinFilepath = this.GetCSharpCompilerBinFilepath(this.FrameworkDir);
-			this.MSBuildBinFilepath = this.GetMSBuildBinFilepath(this.FrameworkDir);
+			this.CSharpCompilerBinFilepath = Path.Combine(this.FrameworkDir, CSharpCompilerBinFilename);
+			this.MSBuildBinFilepath = Path.Combine(this.FrameworkDir, MSBuildBinFilename);
 		}
 
 		public string Version { get; private set; }
@@ -41,18 +41,6 @@ namespace Drone.Lib.DotNet
 			var expandedRootDir = Environment.ExpandEnvironmentVariables(RootDir);
 			var frameworkDir = Path.Combine(expandedRootDir, ver);
 			return frameworkDir;
-		}
-
-		private string GetCSharpCompilerBinFilepath(string frameworkDir)
-		{
-			var path = Path.Combine(frameworkDir, CSharpCompilerBinFilename);
-			return path;
-		}
-
-		private string GetMSBuildBinFilepath(string frameworkDir)
-		{
-			var path = Path.Combine(frameworkDir, MSBuildBinFilename);
-			return path;
 		}
 	}
 }

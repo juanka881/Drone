@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="CommandHandlers\AddHandlerTest.cs" />
     <Compile Include="CommandHandlers\RemoveHandlerTest.cs" />
+    <Compile Include="ModuleFixtures\DroneModuleFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CommandHandlers\InitHandlerTest.cs" />
     <Compile Include="CommandHandlers\CommandHandlerTest.cs" />

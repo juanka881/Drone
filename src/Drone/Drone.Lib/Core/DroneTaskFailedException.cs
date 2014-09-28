@@ -26,9 +26,13 @@ namespace Drone.Lib.Core
 		{
 		}
 
-		public static DroneTaskFailedException Get(Exception ex, string taskName)
+		public static DroneTaskFailedException Get(Exception ex, string message, string taskName)
 		{
 			var msg = "task failed";
+
+			if(!string.IsNullOrWhiteSpace(message))
+				msg = string.Format("task failed - {0}", message);
+
 			var nex = new DroneTaskFailedException(msg, ex);
 
 			nex.Data["task-name"] = taskName;

@@ -7,7 +7,7 @@ namespace Drone.Lib.Helpers
 {
 	public static class ListExtensions
 	{
-		public static void AddMany<T>(this IList<T> list, IEnumerable<T> items)
+		public static void AddRange<T>(this IList<T> list, IEnumerable<T> items)
 		{
 			if (list == null)
 				throw new ArgumentNullException("list");

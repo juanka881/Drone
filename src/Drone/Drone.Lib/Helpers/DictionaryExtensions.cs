@@ -7,7 +7,7 @@ namespace Drone.Lib.Helpers
 {
 	public static class DictionaryExtensions
 	{
-		public static V GetOrDef<K, V>(this IDictionary<K, V> dict, K key, V def = default(V))
+		public static V Get<K, V>(this IDictionary<K, V> dict, K key, V def = default(V))
 		{
 			if (dict == null)
 				throw new ArgumentNullException("dict");

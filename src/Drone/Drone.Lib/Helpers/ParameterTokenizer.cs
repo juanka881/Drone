@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Drone.Lib.Core;
 
 namespace Drone.Lib.Helpers
 {
-	public class StringTokenizer
+	public class ParameterTokenizer
 	{
-		public IEnumerable<StringToken> GetTokens(string str)
+		public IEnumerable<ParameterToken> GetTokens(string str)
 		{
 			if (string.IsNullOrWhiteSpace(str))
 				yield break;
@@ -28,27 +27,27 @@ namespace Drone.Lib.Helpers
 
 				var c = str[startIndex];
 				var endIndex = -1;
-				var type = StringTokenType.Symbol;
+				var type = ParameterTokenType.Symbol;
 
 				if (this.IsObjectStart(c))
 				{
-					type = StringTokenType.Json;
+					type = ParameterTokenType.Json;
 					endIndex = this.ReadObjectIntoBuffer(str, startIndex, sb, stack);
 				}
 				else if (this.IsStringStart(c))
 				{
-					type = StringTokenType.String;
+					type = ParameterTokenType.String;
 					endIndex = this.ReadStringIntoBuffer(str, startIndex, sb, stack, false);
 				}
 				else
 				{
-					type = StringTokenType.Symbol;
+					type = ParameterTokenType.Symbol;
 					endIndex = this.ReadSymbolIntoBuffer(str, startIndex, sb);
 				}
 
 				var token = sb.ToString();
 
-				yield return new StringToken(counter, token, type);
+				yield return new ParameterToken(counter, token, type);
 
 				sb.Clear();
 				stack.Clear();

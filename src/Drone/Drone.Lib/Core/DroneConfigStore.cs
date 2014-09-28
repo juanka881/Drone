@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Drone.Lib.Configs
+namespace Drone.Lib.Core
 {
-	public class DroneConfigRepo
+	public class DroneConfigStore
 	{
 		public DroneConfig Load(Stream stream, string filepath)
 		{

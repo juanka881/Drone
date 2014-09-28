@@ -28,11 +28,16 @@ namespace Drone.Lib.Core
 
 		public static DroneTasksNotFoundException Get(IEnumerable<string> taskNames)
 		{
-			var ex = new DroneTasksNotFoundException("unable to find tasks in drone user module with given name(s)");
+			var ex = new DroneTasksNotFoundException("unable to find tasks in module with given name(s)");
 
 			ex.Data["task-names"] = string.Join(", ", taskNames);
 
 			return ex;
+		}
+
+		public static DroneTasksNotFoundException Get(params string[] taskNames)
+		{
+			return Get(taskNames as IEnumerable<string>);
 		}
 	}
 }

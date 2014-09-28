@@ -30,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac">
-      <HintPath>..\..\..\packages\Autofac.3.3.0\lib\net40\Autofac.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -51,27 +48,28 @@
   <ItemGroup>
     <Compile Include="Compilers\MSBuildHelper.cs" />
     <Compile Include="Compilers\MSBuildOutputLevel.cs" />
-    <Compile Include="Core\AutofacDroneTaskHandlerFactory.cs" />
-    <Compile Include="Core\DroneActionTaskHandler.cs" />
+    <Compile Include="Core\DroneService.cs" />
+    <Compile Include="Core\InvalidLogLevelStringException.cs" />
+    <Compile Include="DroneEnvironmentScope.cs" />
+    <Compile Include="Tasks\ActionTaskHandler.cs" />
     <Compile Include="Core\DroneCreateMainModuleFailedException.cs" />
-    <Compile Include="Core\DroneDependencyOnlyTaskHandler.cs" />
-    <Compile Include="Core\DroneFactoryTask.cs" />
-    <Compile Include="Core\DroneFactoryTaskHandler.cs" />
-    <Compile Include="Core\DroneSetFactoryTask.cs" />
-    <Compile Include="Core\DroneSetFactoryTaskHandler.cs" />
-    <Compile Include="DroneContext.cs" />
+    <Compile Include="Tasks\AliasTaskHandler.cs" />
+    <Compile Include="DroneEnvironment.cs" />
     <Compile Include="DroneFlags.cs" />
     <Compile Include="DroneTaskExtensions.cs" />
     <Compile Include="DroneTaskHandler.cs" />
     <Compile Include="Core\DroneTaskHandlerFactory.cs" />
     <Compile Include="Core\DroneTaskHandlerNotFoundException.cs" />
     <Compile Include="FileSystem\DirectoryMetadata.cs" />
+    <Compile Include="FileSystem\FileChangeSet.cs" />
     <Compile Include="FileSystem\FileMetadata.cs" />
+    <Compile Include="Helpers\Option.cs" />
+    <Compile Include="Helpers\OptionMissingValueException.cs" />
     <Compile Include="Helpers\ProcessRunner.cs" />
     <Compile Include="Helpers\ProcessRunnerOutputReceivedEventArgs.cs" />
     <Compile Include="Helpers\ProcessRunnerResult.cs" />
-    <Compile Include="Helpers\StringTokenType.cs" />
-    <Compile Include="Helpers\StringTokenSet.cs" />
+    <Compile Include="Helpers\ParameterTokenType.cs" />
+    <Compile Include="Helpers\ParameterTokenSet.cs" />
     <Compile Include="Core\DroneCompiler.cs" />
     <Compile Include="Core\DroneCompilerException.cs" />
     <Compile Include="Core\DroneCompileStatus.cs" />
@@ -79,17 +77,16 @@
     <Compile Include="Core\DroneAssemblyLoadException.cs" />
     <Compile Include="Core\DroneAssemblyNotFoundException.cs" />
     <Compile Include="Compilers\CSharpCompilerInvocationException.cs" />
-    <Compile Include="Compilers\ConsoleAppUnableToGetExitCodeException.cs" />
     <Compile Include="Compilers\CSharpCompiler.cs" />
     <Compile Include="Compilers\CSharpCompilerArgs.cs" />
     <Compile Include="Compilers\CSharpCompilerResult.cs" />
     <Compile Include="DotNet\DotNetFramework.cs" />
     <Compile Include="Helpers\FuncStopwatch.cs" />
     <Compile Include="Helpers\FuncStopwatchResult.cs" />
-    <Compile Include="Core\DroneLogHelper.cs" />
-    <Compile Include="Helpers\StringToken.cs" />
-    <Compile Include="Core\DroneActionTask.cs" />
-    <Compile Include="Core\DroneDependencyOnlyTask.cs" />
+    <Compile Include="Core\DroneLogManager.cs" />
+    <Compile Include="Helpers\ParameterToken.cs" />
+    <Compile Include="Tasks\ActionTask.cs" />
+    <Compile Include="Tasks\AliasTask.cs" />
     <Compile Include="DroneModuleExtensions.cs" />
     <Compile Include="DroneTask.cs" />
     <Compile Include="Core\DroneTaskFailedException.cs" />
@@ -99,24 +96,23 @@
     <Compile Include="DroneTaskState.cs" />
     <Compile Include="Helpers\HashHelper.cs" />
     <Compile Include="Helpers\ListExtensions.cs" />
-    <Compile Include="Helpers\ObjectExtensions.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
     <Compile Include="DroneConfig.cs" />
     <Compile Include="Core\DroneMainModuleNotFoundException.cs" />
     <Compile Include="Core\DroneTaskRunner.cs" />
     <Compile Include="Core\DroneTasksNotFoundException.cs" />
     <Compile Include="Core\DroneTooManyMainModulesFoundException.cs" />
-    <Compile Include="Configs\DroneConfigRepo.cs" />
-    <Compile Include="Configs\DroneConfigRepoExtensions.cs" />
+    <Compile Include="Core\DroneConfigStore.cs" />
     <Compile Include="Helpers\DictionaryExtensions.cs" />
     <Compile Include="Helpers\ExceptionExtensions.cs" />
     <Compile Include="Helpers\HumanTime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Helpers\StringTokenizer.cs" />
+    <Compile Include="Helpers\ParameterTokenizer.cs" />
     <Compile Include="Tasks\CleanTask.cs" />
     <Compile Include="Tasks\CleanTaskHandler.cs" />
     <Compile Include="Tasks\CopyFileTask.cs" />
     <Compile Include="Tasks\CopyFileTaskHanlder.cs" />
+    <Compile Include="FileSystem\FileSet.cs" />
     <Compile Include="Tasks\MSBuildTask.cs" />
     <Compile Include="Tasks\MSBuildTaskHandler.cs" />
     <Compile Include="Tasks\MSBuildVerbosity.cs" />
@@ -125,7 +121,7 @@
     <Compile Include="Tasks\RunProcessTaskResult.cs" />
     <Compile Include="Tasks\StartProcessTask.cs" />
     <Compile Include="Tasks\StartProcessTaskHandler.cs" />
-    <Compile Include="VSProjects\CSharpProjectFile.cs" />
+    <Compile Include="VSProjects\CSProjectMetadata.cs" />
     <Compile Include="VSProjects\VSProject.cs" />
   </ItemGroup>
   <ItemGroup>

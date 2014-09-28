@@ -32,7 +32,6 @@ namespace Drone.Lib.Core
 				throw new ArgumentNullException("task");
 
 			var ex = new DroneTaskHandlerNotFoundException("unable to find handler for task");
-			ex.Data["task-is-null"] = task == null;
 			ex.Data["task-type"] = task == null ? string.Empty : task.GetType().FullName;
 
 			return ex;

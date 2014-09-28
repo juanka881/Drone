@@ -40,7 +40,6 @@
 				<File Id="Drone.Lib.dll" Name="$(var.Drone.Lib.TargetFileName)" Source="$(var.Drone.Lib.TargetPath)" />
 				
 				<!-- external libs -->
-				<File Id="Autofac.dll" Name="Autofac.dll" Source="$(var.Drone.App.TargetDir)Autofac.dll" />
 				<File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.Drone.App.TargetDir)Newtonsoft.Json.dll" />
 				<File Id="NLog.dll" Name="NLog.dll" Source="$(var.Drone.App.TargetDir)NLog.dll" />
 				

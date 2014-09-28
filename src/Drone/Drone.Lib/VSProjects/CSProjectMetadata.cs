@@ -7,9 +7,9 @@ using System.Text;
 
 namespace Drone.Lib.VSProjects
 {
-	public class CSharpProjectMetadata : FileMetadata
+	public class CSProjectMetadata : FileMetadata
 	{
-		public CSharpProjectMetadata(string filename, string rootDir = null) : base(filename, rootDir)
+		public CSProjectMetadata(string filename, string rootDir = null) : base(filename, rootDir)
 		{
 		}
 

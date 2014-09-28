@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Drone.Lib.Helpers;
-using DroneTasks.Tasks;
 using Drone.Lib.VSProjects;
 
 namespace Drone.Lib.Tasks
@@ -16,7 +15,7 @@ namespace Drone.Lib.Tasks
 		{
 			get
 			{
-				return this.Properties.GetOrDef("Configuration");
+				return this.Properties.Get("Configuration");
 			}
 			set
 			{

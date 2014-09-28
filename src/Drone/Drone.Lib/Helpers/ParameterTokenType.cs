@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Drone.Lib.Helpers
 {
-	public enum StringTokenType
+	public enum ParameterTokenType
 	{
 		String,
 		Symbol,

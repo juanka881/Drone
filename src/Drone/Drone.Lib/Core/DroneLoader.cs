@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Drone.Lib.Configs;
 using NLog;
 
 namespace Drone.Lib.Core
 {
 	public class DroneLoader
 	{
-		public Logger Log { get; set; }
+		private readonly Logger log;
+
+		public DroneLoader()
+		{
+			this.log = DroneLogManager.GetLog();
+		}
 
 		public DroneModule Load(DroneConfig config)
 		{
@@ -19,19 +23,19 @@ namespace Drone.Lib.Core
 
 			var assembly = null as Assembly;
 
-			this.Log.Debug("attempting to load drone module assembly: '{0}'", Path.GetFileName(config.AssemblyFilepath));
+			this.log.Debug("attempting to load drone module assembly: '{0}'", Path.GetFileName(config.AssemblyFilepath));
 
 			try
 			{
 				assembly = Assembly.LoadFrom(config.AssemblyFilepath);
-				this.Log.Debug("assembly loaded");
+				this.log.Debug("assembly loaded");
 			}
 			catch (Exception ex)
 			{
 				throw DroneAssemblyLoadException.Get(config.AssemblyFilepath, ex);
 			}
 
-			this.Log.Debug("searching for main drone module...");
+			this.log.Debug("searching for main drone module...");
 
 			var moduleTypes = (from type in assembly.GetTypes()
 							   where typeof(DroneModule).IsAssignableFrom(type) &&
@@ -40,19 +44,19 @@ namespace Drone.Lib.Core
 
 			if (moduleTypes.Count > 0)
 			{
-				this.Log.Debug("found {0} drone module{1}", moduleTypes.Count, moduleTypes.Count > 1 ? "s" : string.Empty);
+				this.log.Debug("found {0} drone module{1}", moduleTypes.Count, moduleTypes.Count > 1 ? "s" : string.Empty);
 
 				if(moduleTypes.Count > 1)
 					throw DroneTooManyMainModulesFoundException.Get(moduleTypes);
 
 				var moduleType = moduleTypes[0];
 
-				this.Log.Debug("creating drone module instance from type: '{0}'", moduleType.FullName);
+				this.log.Debug("creating drone module instance from type: '{0}'", moduleType.FullName);
 
 				try
 				{
 					var module = Activator.CreateInstance(moduleType) as DroneModule;
-					this.Log.Debug("drone module created");
+					this.log.Debug("drone module created");
 					return module;
 				}
 				catch(Exception ex)
@@ -62,7 +66,7 @@ namespace Drone.Lib.Core
 			}
 			else
 			{
-				this.Log.Debug("no drone modules found");
+				this.log.Debug("no drone modules found");
 
 				throw DroneMainModuleNotFoundException.Get();
 			}

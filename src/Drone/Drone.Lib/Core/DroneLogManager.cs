@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Drone.Lib.Core
 {
-	public static class DroneLogHelper
+	public static class DroneLogManager
 	{
 		public static readonly string LogName = "drone";
 
@@ -28,6 +28,51 @@ namespace Drone.Lib.Core
 		public static Logger GetLog()
 		{
 			return LogManager.GetLogger(LogName);
+		}
+
+		public static LogLevel GetLogLevelFromString(string str)
+		{
+			if (string.IsNullOrWhiteSpace(str))
+				throw InvalidLogLevelStringException.Get(str);
+
+			var level = null as LogLevel;
+
+			switch (str.ToLower())
+			{
+				case "off":
+					level = LogLevel.Off;
+					break;
+
+				case "fatal":
+					level = LogLevel.Fatal;
+					break;
+
+				case "error":
+				case "err":
+					level = LogLevel.Error;
+					break;
+
+				case "warn":
+					level = LogLevel.Warn;
+					break;
+
+				case "info":
+					level = LogLevel.Info;
+					break;
+
+				case "debug":
+					level = LogLevel.Debug;
+					break;
+
+				case "trace":
+					level = LogLevel.Trace;
+					break;
+			}
+
+			if (level == null)
+				throw InvalidLogLevelStringException.Get(str);
+
+			return level;
 		}
 
 		public static void DeleteErrorLogFile()

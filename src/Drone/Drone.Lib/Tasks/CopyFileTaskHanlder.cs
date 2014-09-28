@@ -9,13 +9,13 @@ namespace Drone.Lib.Tasks
 	{
 		public override void Handle(CopyFileTask task, DroneTaskContext context)
 		{
-			foreach(var src in task.Sources)
-			{
-				this.CopyCore(src, task.Destination, (s, d) =>
-				{
-					context.Log.Info("{0} => {1}", s, d);
-				});
-			}
+			//foreach(var src in task.Sources)
+			//{
+			//	this.CopyCore(src, task.Destination, (s, d) =>
+			//	{
+			//		context.Log.Info("{0} => {1}", s, d);
+			//	});
+			//}
 		}
 
 		private string GetRelativePath(string fullpath, string rootpath)

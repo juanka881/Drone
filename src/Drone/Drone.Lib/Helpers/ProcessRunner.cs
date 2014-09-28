@@ -24,23 +24,23 @@ namespace Drone.Lib.Helpers
 		private CancellationTokenSource processDispatchOutputEventsTokenSource;
 		private ConcurrentQueue<ProcessRunnerOutputReceivedEventArgs> processOutputQueue;
 		
-		private int exitCode;
-		private DateTime exitTimestamp;
+		private int? exitCode;
+		private DateTime? exitTimestamp;
 
 		private readonly object sync = new object();
 
 		private readonly string filename;
-		private readonly string commandLine;
+		private readonly string args;
 		private readonly string workDir;
 		private readonly bool redirectStreams;
 
-		public ProcessRunner(string filename, string commandLine, string workDir = null, bool redirectStreams = false)
+		public ProcessRunner(string filename, string args, string workDir = null, bool redirectStreams = false)
 		{
 			if(string.IsNullOrWhiteSpace(filename))
 				throw new ArgumentException("filename is empty or null", "filename");
 
 			this.filename = filename;
-			this.commandLine = commandLine;
+			this.args = args;
 			this.workDir = workDir;
 			this.redirectStreams = redirectStreams;
 			this.processOutputQueue = new ConcurrentQueue<ProcessRunnerOutputReceivedEventArgs>();
@@ -100,31 +100,37 @@ namespace Drone.Lib.Helpers
 			if(!hasProcessExited)
 				return null;
 
-			this.processReadStandardOutputTask.Wait(ts);
+			if(this.redirectStreams)
+			{
+				this.processReadStandardOutputTask.Wait(ts);
 
-			var hasReadStandardOutputTaskEnded = this.processReadStandardOutputTask != null &&
-												 this.processReadStandardOutputTask.IsCompleted;
+				var hasReadStandardOutputTaskEnded = this.processReadStandardOutputTask.IsCompleted;
 
-			if(!hasReadStandardOutputTaskEnded)
-				return null;
+				if (!hasReadStandardOutputTaskEnded)
+					return null;
 
-			this.processReadStandardErrorTask.Wait(ts);
+				this.processReadStandardErrorTask.Wait(ts);
 
-			var hasReadStandardErrorTaskEnded = this.processReadStandardErrorTask != null &&
-												this.processReadStandardErrorTask.IsCompleted;
+				var hasReadStandardErrorTaskEnded = this.processReadStandardErrorTask.IsCompleted;
 
-			if(!hasReadStandardErrorTaskEnded)
-				return null;
+				if (!hasReadStandardErrorTaskEnded)
+					return null;
 
-			this.processDispatchOutputEventsTask.Wait(ts);
+				this.processDispatchOutputEventsTask.Wait(ts);
 
-			var hasDispatchOutputTaskEnded = this.processDispatchOutputEventsTask != null &&
-											 this.processDispatchOutputEventsTask.IsCompleted;
+				var hasDispatchOutputTaskEnded = this.processDispatchOutputEventsTask.IsCompleted;
 
-			if (!hasDispatchOutputTaskEnded)
-				return null;
+				if (!hasDispatchOutputTaskEnded)
+					return null;	
+			}
 
-			return new ProcessRunnerResult(this.exitTimestamp, this.exitCode);
+			if(this.exitCode == null)
+				throw new Exception("unable to get exit code even though process has stopped");
+
+			if(this.exitTimestamp == null)
+				throw new Exception("unable to get exit timestamp even though process has stopped");
+
+			return new ProcessRunnerResult(this.exitTimestamp.Value, this.exitCode.Value);
 		}
 
 		public ProcessRunnerResult WaitForExit()
@@ -143,7 +149,7 @@ namespace Drone.Lib.Helpers
 				this.process.StartInfo = psi;
 
 				psi.FileName = this.filename;
-				psi.Arguments = this.commandLine;
+				psi.Arguments = this.args;
 				psi.CreateNoWindow = true;
 				psi.RedirectStandardError = this.redirectStreams;
 				psi.RedirectStandardInput = this.redirectStreams;
@@ -204,6 +210,9 @@ namespace Drone.Lib.Helpers
 
 				if (this.processOutputQueue.TryDequeue(out e))
 					this.NotifyProcessOutputReceived(e);
+
+				if(this.exitCode != null && this.processOutputQueue.Count == 0)
+					break;
 			}
 		}
 

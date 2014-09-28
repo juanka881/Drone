@@ -53,7 +53,7 @@ namespace Drone.Lib.Compilers
 
 				var processResult = null as ProcessRunnerResult;
 
-				using(var processRunner = new ProcessRunner(command, commandArgs))
+				using(var processRunner = new ProcessRunner(command, commandArgs, redirectStreams: true))
 				{
 					processRunner.ProcessOutputRecevied += this.Process_OnOutputReceived;
 					processRunner.Start();

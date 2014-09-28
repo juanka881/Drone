@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 namespace Drone.Lib.Compilers
 {
 	[Serializable]
-	public partial class CSharpCompilerInvocationException : Exception
+	public class CSharpCompilerInvocationException : Exception
 	{
 		public CSharpCompilerInvocationException()
 		{

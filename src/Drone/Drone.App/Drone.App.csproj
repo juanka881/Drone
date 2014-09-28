@@ -47,10 +47,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\packages\Autofac.3.3.0\lib\net40\Autofac.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -67,21 +63,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandHandlers\AddHandler.cs" />
-    <Compile Include="CommandHandlers\CompilerHandler.cs" />
-    <Compile Include="CommandHandlers\GetPropertyHandler.cs" />
-    <Compile Include="CommandHandlers\HelpHandler.cs" />
-    <Compile Include="CommandHandlers\InitHandler.cs" />
-    <Compile Include="CommandHandlers\ListHandler.cs" />
-    <Compile Include="CommandHandlers\RemoveHandler.cs" />
-    <Compile Include="CommandHandlers\RemovePropertyHandler.cs" />
-    <Compile Include="CommandHandlers\RunHandler.cs" />
-    <Compile Include="CommandHandlers\SetPropertyHandler.cs" />
-    <Compile Include="CommandHandlers\SyncHandler.cs" />
-    <Compile Include="Core\CommandHandler.cs" />
-    <Compile Include="Core\CommandHandlerNotFoundException.cs" />
-    <Compile Include="Core\CommandRunner.cs" />
-    <Compile Include="Core\InvalidLogLevelStringException.cs" />
+    <Compile Include="UnknownCommandException.cs" />
+    <Compile Include="DroneApp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

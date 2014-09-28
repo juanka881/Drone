@@ -5,16 +5,16 @@ using System.Linq;
 
 namespace Drone.Lib.Helpers
 {
-	public class StringTokenSet : IEnumerable<StringToken>
+	public class ParameterTokenSet : IEnumerable<ParameterToken>
 	{
-		private readonly IList<StringToken> tokens;
+		private readonly IList<ParameterToken> tokens;
 
-		public StringTokenSet(IEnumerable<StringToken> tokens)
+		public ParameterTokenSet(IEnumerable<ParameterToken> tokens)
 		{
 			if (tokens == null)
 				throw new ArgumentNullException("tokens");
 
-			this.tokens = new List<StringToken>(tokens);
+			this.tokens = new List<ParameterToken>(tokens);
 		}
 
 		public int Count
@@ -25,7 +25,7 @@ namespace Drone.Lib.Helpers
 			}
 		}
 
-		public StringToken Pop()
+		public ParameterToken Pop()
 		{
 			if (this.tokens.Count == 0)
 				return null;
@@ -46,7 +46,7 @@ namespace Drone.Lib.Helpers
 			}
 		}
 
-		public StringToken TryGetAt(int i)
+		public ParameterToken TryGetAt(int i)
 		{
 			if(i >= 0 && i < this.tokens.Count)
 				return this.tokens[i];
@@ -54,10 +54,10 @@ namespace Drone.Lib.Helpers
 				return null;
 		}
 
-		public bool GetFlagAndRemove(string flag)
+		public bool PopFlag(string flag)
 		{
 			if(string.IsNullOrWhiteSpace(flag))
-				throw new ArgumentException("flag is empty or null", "flag");
+				throw new ArgumentException("flag is empty or null", "name");
 
 			var token = this.tokens.FirstOrDefault(x => x.Value == flag);
 
@@ -67,17 +67,13 @@ namespace Drone.Lib.Helpers
 			return token != null;
 		}
 
-		public string GetFlagValueAndRemove(string flag, string def)
+		public string PopFlagValue(string flag, string def)
 		{
 			var pair = (from flagToken in this.tokens
 						where flagToken.Value == flag
 						let valueToken = this.TryGetAt(flagToken.Index + 1)
 						where valueToken != null
-						select new
-						{
-							flagToken,
-							valueToken
-						}).FirstOrDefault();
+						select new { flagToken, valueToken }).FirstOrDefault();
 
 			if (pair != null)
 			{
@@ -91,7 +87,7 @@ namespace Drone.Lib.Helpers
 			}
 		}
 
-		public IEnumerator<StringToken> GetEnumerator()
+		public IEnumerator<ParameterToken> GetEnumerator()
 		{
 			return this.tokens.GetEnumerator();
 		}

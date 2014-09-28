@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Drone.Lib.Configs;
 using Drone.Lib.Core;
 
 namespace Drone.Tests.CommandHandlers
