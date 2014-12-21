@@ -13,9 +13,11 @@ namespace Drone.Lib
 	{
 		public static readonly string DroneFileName = "drone.json";
 
-		public static readonly string DroneDirName = ".drone";
+		public static readonly string DroneDirName = "drone-files";
 
 		public static readonly string DroneReferencesDirName = "refs";
+
+		public static readonly string DroneBuildBaseDirName = "bin";
 
 		public static readonly string AssemblyFileName = "DroneUserTasks.dll";
 
@@ -70,7 +72,7 @@ namespace Drone.Lib
 			this.DirPath = Path.GetDirectoryName(this.FilePath);
 			this.DroneDirPath = Path.Combine(this.DirPath, DroneDirName);
 			this.DroneReferencesDirPath = Path.Combine(this.DroneDirPath, DroneReferencesDirName);
-			this.BuildDirPath = Path.Combine(this.DroneDirPath, this.HashId.Substring(0, 8));
+			this.BuildDirPath = Path.Combine(this.DroneDirPath, DroneBuildBaseDirName, this.HashId.Substring(0, 8));
 			this.AssemblyFilePath = Path.Combine(this.BuildDirPath, AssemblyFileName);
 		}
 	}
