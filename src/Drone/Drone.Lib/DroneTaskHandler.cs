@@ -8,7 +8,7 @@ namespace Drone.Lib
 	{
 		public abstract void Handle(DroneTaskContext context);
 
-		public static IDictionary<Type, Type> GetHanlderTypes()
+		public static IDictionary<Type, Type> GetHandlerTypes()
 		{
 			var taskType = typeof(DroneTask);
 			var handlerType = typeof(DroneTaskHandler);

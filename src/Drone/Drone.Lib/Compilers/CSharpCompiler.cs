@@ -47,7 +47,7 @@ namespace Drone.Lib.Compilers
 				responseFilename = Path.GetTempFileName();
 				commandArgs = string.Format("@{0}", responseFilename);
 
-				command = framework.CSharpCompilerBinFilepath;
+				command = framework.CSharpCompilerBinFilePath;
 				var responseFileText = this.GetCompilerArgString(args);
 				File.WriteAllText(responseFilename, responseFileText);
 
@@ -55,7 +55,7 @@ namespace Drone.Lib.Compilers
 
 				using(var processRunner = new ProcessRunner(command, commandArgs, redirectStreams: true))
 				{
-					processRunner.ProcessOutputRecevied += this.Process_OnOutputReceived;
+					processRunner.OutputRecevied += this.Process_OnOutputReceived;
 					processRunner.Start();
 					processResult = processRunner.WaitForExit();
 				}
@@ -115,7 +115,7 @@ namespace Drone.Lib.Compilers
 			}
 		}
 
-		private void Process_OnOutputReceived(object sender, ProcessRunnerOutputReceivedEventArgs e)
+		private void Process_OnOutputReceived(object sender, ProcessRunnerOutputEventArgs e)
 		{
 			if (string.IsNullOrWhiteSpace(e.Data))
 				return;

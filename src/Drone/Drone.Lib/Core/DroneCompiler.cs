@@ -7,27 +7,65 @@ using Drone.Lib.Helpers;
 using NLog;
 using System.Text.RegularExpressions;
 using System.Text;
+using Drone.Lib.FileSystem;
 
 namespace Drone.Lib.Core
 {
 	public class DroneCompiler
 	{
+		public static readonly string CacheFileName = "cache.json";
+
 		public readonly Logger log;
+
+		private readonly JsonStore store;
 
 		public DroneCompiler()
 		{
 			this.log = DroneLogManager.GetLog();
+			this.store = new JsonStore();
 		}
 
 		public bool NeedsRecompile(DroneConfig config)
 		{
-			//if (File.Exists(Path.Combine(config.BinDirpath, CompileStatusFilename)))
-			//	return true;
+			this.EnsureBuildDirExits(config);
 
-			//if (File.Exists(config.AssemblyFilepath))
-			//	return true;
+			if(!File.Exists(config.AssemblyFilePath))
+				return true;
 
-			return true;
+			if(!File.Exists(this.GetCacheFileName(config)))
+				return true;
+
+			var cache = this.store.Load<FileMetadataCache>(this.GetCacheFileName(config));
+			return cache.HasChanges();
+		}
+
+		private void EnsureBuildDirExits(DroneConfig config)
+		{
+			if(config == null)
+				throw new ArgumentNullException("config");
+
+			if(!Directory.Exists(config.BuildDirPath))
+				Directory.CreateDirectory(config.BuildDirPath);
+		}
+
+		private string GetCacheFileName(DroneConfig config)
+		{
+			return Path.Combine(config.BuildDirPath, CacheFileName);
+		}
+
+		private void CreateCache(DroneConfig config)
+		{
+			var cache = new FileMetadataCache();
+
+			cache.Add(new FileInfo(config.FilePath));
+
+			foreach(var source in config.SourceFiles)
+				cache.Add(new FileInfo(source));
+
+			foreach(var reference in config.ReferenceFiles)
+				cache.Add(new FileInfo(reference));
+
+			this.store.Save(this.GetCacheFileName(config), cache);
 		}
 
 		private IEnumerable<string> GetBaseReferenceFiles()
@@ -56,15 +94,15 @@ namespace Drone.Lib.Core
 
 				var compiler = new CSharpCompiler();
 
-				this.log.Debug("checking if output dir exists '{0}'", config.BinDirpath);
+				this.log.Debug("checking if output dir exists '{0}'", config.BuildDirPath);
 
-				if (!Directory.Exists(config.BinDirpath))
+				if (!Directory.Exists(config.BuildDirPath))
 				{
 					this.log.Debug("output dir not found. creating output bin dir");
-					Directory.CreateDirectory(config.BinDirpath);
+					Directory.CreateDirectory(config.BuildDirPath);
 				}
 
-				var configDirpath = Path.GetDirectoryName(config.Filepath);
+				var configDirpath = Path.GetDirectoryName(config.FilePath);
 
 				var resolvedBaseReferences = this.GetBaseReferenceFiles();
 				var resolvedConfigReferences = this.ResolveReferenceFiles(config.ReferenceFiles, configDirpath);
@@ -76,12 +114,12 @@ namespace Drone.Lib.Core
 				this.log.Debug("creating csharp compiler args");
 
 				var args = new CSharpCompilerArgs(
-					config.Dirname,
-					config.AssemblyFilepath,
+					config.DirName,
+					config.AssemblyFilePath,
 					sourceFiles,
 					referenceFiles);
 
-				if (DroneEnvironment.Flags != null && DroneEnvironment.Flags.IsDebugEnabled)
+				if (DroneContext.Flags != null && DroneContext.Flags.IsDebugEnabled)
 				{
 					args.Debug = true;
 					args.Optimize = false;
@@ -108,7 +146,7 @@ namespace Drone.Lib.Core
 						this.log.Debug(file);
 				}
 
-				this.log.Debug("calling csc compiler '{0}'...", config.Filename);
+				this.log.Debug("calling csc compiler '{0}'...", config.FileName);
 
 				var result = compiler.Compile(args);
 
@@ -177,11 +215,12 @@ namespace Drone.Lib.Core
 			if (this.NeedsRecompile(config))
 			{
 				var result = this.CompileCore(config);
-
+				
 				try
 				{
 					if (result.IsSuccess)
 					{
+						this.CreateCache(config);
 						this.log.Log(logLevel, "compiled ({0})", HumanTime.Format(result.TimeElapsed));
 					}
 					else

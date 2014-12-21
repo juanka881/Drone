@@ -6,16 +6,54 @@ namespace Drone.Lib.FileSystem
 {
 	public class FileSet
 	{
+		private HashSet<string> includePatterns;
+		private HashSet<string> excludePatterns;
+
 		public FileSet()
 		{
 			this.BaseDir = string.Empty;
 			this.IncludePatterns = new HashSet<string>();
 			this.ExcludePatterns = new HashSet<string>();
+
+			this.Base("..").Include("src/**/*.js");
 		}
 
-		public HashSet<string> IncludePatterns { get; set; }
+		public IEnumerable<string> GetFiles()
+		{
+			yield break;
+		}
 
-		public HashSet<string> ExcludePatterns { get; set; }
+		public HashSet<string> IncludePatterns
+		{
+			get
+			{
+				return includePatterns;
+			}
+
+			set
+			{
+				if (value == null)
+					value = new HashSet<string>();
+
+				includePatterns = value;
+			}
+		}
+
+		public HashSet<string> ExcludePatterns
+		{
+			get
+			{
+				return excludePatterns;
+			}
+
+			set
+			{
+				if(value == null)
+					value = new HashSet<string>();
+
+				excludePatterns = value;
+			}
+		}
 
 		public string BaseDir { get; set; }
 

@@ -9,18 +9,14 @@ namespace Drone.Lib.VSProjects
 {
 	public class CSProjectMetadata : FileMetadata
 	{
-		public CSProjectMetadata(string filename, string rootDir = null) : base(filename, rootDir)
-		{
-		}
-
-		public string DebugDir { get; set; }
-
-		public string ReleaseDir { get; set; }
-
-		protected override void OnSet()
+		public CSProjectMetadata(string filePath) : base(filePath)
 		{
 			this.DebugDir = Path.Combine(this.FileDir, VSProject.BinDir, VSProject.DebugConfigName);
 			this.ReleaseDir = Path.Combine(this.FileDir, VSProject.BinDir, VSProject.ReleaseConfigName);
 		}
+
+		public string DebugDir { get; private set; }
+
+		public string ReleaseDir { get; private set; }
 	}
 }

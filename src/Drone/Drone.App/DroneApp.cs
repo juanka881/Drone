@@ -24,12 +24,12 @@ namespace Drone.App
 			LogLevel.Trace
 		};
 
-		private readonly DroneService service;
+		private readonly DroneService droneService;
 		private readonly Logger log;
 
 		public DroneApp()
 		{
-			this.service = new DroneService();
+			this.droneService = new DroneService();
 			this.log = DroneLogManager.GetLog();
 		}
 
@@ -42,7 +42,7 @@ namespace Drone.App
 
 		private DroneFlags GetFlags(ParameterTokenSet tokens)
 		{
-			var configFilename = tokens.PopFlagValue("-f", DroneConfig.DefaultFilename);
+			var configFilename = tokens.PopFlagValue("-f", DroneConfig.DefaultFileName);
 			var isDebugEnabled = tokens.PopFlag("-d");
 			var isConsoleLogColorsEnabled = !tokens.PopFlag("-no-colors");
 			var logLevel = DroneLogManager.GetLogLevelFromString(tokens.PopFlagValue("-l", "info"));
@@ -86,7 +86,7 @@ namespace Drone.App
 
 			if (errorFileTarget != null)
 			{
-				var configPath = Path.GetFullPath(flags.ConfigFilename);
+				var configPath = Path.GetFullPath(flags.ConfigFileName);
 				var configDir = Path.GetDirectoryName(configPath);
 				errorFileTarget.FileName = Path.Combine(configDir, "drone.errors.txt");
 			}
@@ -302,16 +302,16 @@ namespace Drone.App
 
 		private void CompileCommand(ParameterTokenSet tokens, DroneFlags flags)
 		{
-			var config = this.service.LoadConfig(flags.ConfigFilename);
-			this.service.CompileTasks(config, LogLevel.Info);
+			var config = this.droneService.LoadConfig(flags.ConfigFileName);
+			this.droneService.CompileTasks(config, LogLevel.Info);
 		}
 
 		private void ListCommand(ParameterTokenSet tokens, DroneFlags flags)
 		{
-			var config = this.service.LoadConfig(flags.ConfigFilename);
+			var config = this.droneService.LoadConfig(flags.ConfigFileName);
 
 			// need to add pattern matching to the check
-			var tasks = this.service.GetTasks(config, flags, string.Empty).ToList(); 
+			var tasks = this.droneService.GetTasks(config, flags, string.Empty).ToList(); 
 			
 			var taskCounter = 0;
 
@@ -336,27 +336,27 @@ namespace Drone.App
 
 		private void RemovePropertyCommand(ParameterTokenSet tokens, DroneFlags flags)
 		{
-			var config = this.service.LoadConfig(flags.ConfigFilename);
+			var config = this.droneService.LoadConfig(flags.ConfigFileName);
 			var key = tokens.TryGetAt(0);
 
 			if (key != null)
 			{
-				if (config.Properties.Remove(key.Value))
+				if (config.Props.Remove(key.Value))
 					this.log.Info("property '{0}' removed", key.Value);
 			}
 
-			this.service.SaveConfig(config);
+			this.droneService.SaveConfig(config);
 		}
 
 		private void GetPropertyCommand(ParameterTokenSet tokens, DroneFlags flags)
 		{
-			var config = this.service.LoadConfig(flags.ConfigFilename);
+			var config = this.droneService.LoadConfig(flags.ConfigFileName);
 
 			var key = tokens.TryGetAt(0);
 
 			if (key == null)
 			{
-				foreach (var prop in config.Properties)
+				foreach (var prop in config.Props)
 				{
 					this.log.Info("{0}: {1}", prop.Key, prop.Value);
 				}
@@ -364,7 +364,7 @@ namespace Drone.App
 			else
 			{
 				var token = null as JToken;
-				if (!config.Properties.TryGetValue(key.Value, out token))
+				if (!config.Props.TryGetValue(key.Value, out token))
 					return;
 
 				this.log.Info("{0}: {1}", key.Value, token);
@@ -373,7 +373,7 @@ namespace Drone.App
 
 		private void SetPropertyCommand(ParameterTokenSet tokens, DroneFlags flags)
 		{
-			var config = this.service.LoadConfig(flags.ConfigFilename);
+			var config = this.droneService.LoadConfig(flags.ConfigFileName);
 
 			if (tokens.Count == 0)
 			{
@@ -399,20 +399,19 @@ namespace Drone.App
 				return;
 			}
 
-			config.Properties[key.Value] = (JToken)this.GetTokenJsonValue(val, type);
+			config.Props[key.Value] = (JToken)this.GetTokenJsonValue(val, type);
 
-			this.service.SaveConfig(config);
+			this.droneService.SaveConfig(config);
 
 			this.log.Info("key: {0}", key.Value);
-			this.log.Info("value: {0}", config.Properties[key.Value]);
+			this.log.Info("value: {0}", config.Props[key.Value]);
 		}
 
 		private void RunCommand(ParameterTokenSet tokens, DroneFlags flags)
 		{
-			var config = this.service.LoadConfig(flags.ConfigFilename);
+			var config = this.droneService.LoadConfig(flags.ConfigFileName);
 			var taskNames = tokens.Where(x => !x.Value.StartsWith("-")).Select(x => x.Value);
-			this.service.RunTasks(config, flags, taskNames);
-			
+			this.droneService.RunTasks(config, flags, taskNames);
 		}
 
 		private void RemoveCommand(ParameterTokenSet tokens, DroneFlags flags)
@@ -435,10 +434,10 @@ namespace Drone.App
 				return;
 			}
 
-			var config = this.service.LoadConfig(flags.ConfigFilename);
+			var config = this.droneService.LoadConfig(flags.ConfigFileName);
 
-			this.service.RemoveFiles(config, sources, refs);
-			this.service.SaveConfig(config);
+			this.droneService.RemoveFiles(config, sources, refs);
+			this.droneService.SaveConfig(config);
 		}
 
 		private void AddCommand(ParameterTokenSet tokens, DroneFlags flags)
@@ -461,10 +460,10 @@ namespace Drone.App
 				return;
 			}
 
-			var config = this.service.LoadConfig(flags.ConfigFilename);
+			var config = this.droneService.LoadConfig(flags.ConfigFileName);
 
-			this.service.AddFiles(config, sources, refs);
-			this.service.SaveConfig(config);
+			this.droneService.AddFiles(config, sources, refs);
+			this.droneService.SaveConfig(config);
 		}
 
 		private void ShowHelpCommand(ParameterTokenSet tokens, DroneFlags flags)
@@ -474,18 +473,18 @@ namespace Drone.App
 
 		private void InitCommand(ParameterTokenSet tokens, DroneFlags flags)
 		{
-			if (File.Exists(flags.ConfigFilename))
+			if (File.Exists(flags.ConfigFileName))
 			{
-				this.log.Warn("file '{0}' already exists", flags.ConfigFilename);
+				this.log.Warn("file '{0}' already exists", flags.ConfigFileName);
 				return;
 			}
 
 			var config = new DroneConfig();
-			config.SetConfigFilename(flags.ConfigFilename);
+			config.SetConfigFilename(flags.ConfigFileName);
 
-			this.service.SaveConfig(config);
+			this.droneService.SaveConfig(config);
 
-			this.log.Info("created '{0}'", flags.ConfigFilename);
+			this.log.Info("created '{0}'", flags.ConfigFileName);
 		}
 
 		public void Run(string commandLine)

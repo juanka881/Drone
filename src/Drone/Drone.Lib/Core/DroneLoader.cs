@@ -18,21 +18,21 @@ namespace Drone.Lib.Core
 
 		public DroneModule Load(DroneConfig config)
 		{
-			if (!File.Exists(config.AssemblyFilepath))
-				throw DroneAssemblyNotFoundException.Get(config.AssemblyFilepath);
+			if (!File.Exists(config.AssemblyFilePath))
+				throw DroneAssemblyNotFoundException.Get(config.AssemblyFilePath);
 
 			var assembly = null as Assembly;
 
-			this.log.Debug("attempting to load drone module assembly: '{0}'", Path.GetFileName(config.AssemblyFilepath));
+			this.log.Debug("attempting to load drone module assembly: '{0}'", Path.GetFileName(config.AssemblyFilePath));
 
 			try
 			{
-				assembly = Assembly.LoadFrom(config.AssemblyFilepath);
+				assembly = Assembly.LoadFrom(config.AssemblyFilePath);
 				this.log.Debug("assembly loaded");
 			}
 			catch (Exception ex)
 			{
-				throw DroneAssemblyLoadException.Get(config.AssemblyFilepath, ex);
+				throw DroneAssemblyLoadException.Get(config.AssemblyFilePath, ex);
 			}
 
 			this.log.Debug("searching for main drone module...");

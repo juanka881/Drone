@@ -4,12 +4,11 @@ using System.Linq;
 
 namespace Drone.Lib
 {
-	internal class DroneEnvironmentScope : IDisposable
+	internal class DroneContextScope : IDisposable
 	{
 		public void Dispose()
 		{
-			DroneEnvironment.Flags = null;
-			DroneEnvironment.Config = null;
+			DroneContext.Unset();
 		}
 	}
 }

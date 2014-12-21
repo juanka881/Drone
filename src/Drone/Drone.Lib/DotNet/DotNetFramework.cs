@@ -8,7 +8,7 @@ namespace Drone.Lib.DotNet
 {
 	public class DotNetFramework
 	{
-		private static readonly string RootDir = @"%WINDIR%\Microsoft.NET\Framework";
+		private static readonly string RootDirPath = @"%WINDIR%\Microsoft.NET\Framework";
 		private static readonly string CSharpCompilerBinFilename = "csc.exe";
 		private static readonly string MSBuildBinFilename = "msbuild.exe";
 
@@ -20,25 +20,25 @@ namespace Drone.Lib.DotNet
 				throw new ArgumentException("ver is empty or null", "ver");
 
 			this.Version = ver;
-			this.FrameworkDir = this.GetFrameworkDir(this.Version);
-			this.CSharpCompilerBinFilepath = Path.Combine(this.FrameworkDir, CSharpCompilerBinFilename);
-			this.MSBuildBinFilepath = Path.Combine(this.FrameworkDir, MSBuildBinFilename);
+			this.FrameworkDirPath = this.GetFrameworkDir(this.Version);
+			this.CSharpCompilerBinFilePath = Path.Combine(this.FrameworkDirPath, CSharpCompilerBinFilename);
+			this.MSBuildBinFilePath = Path.Combine(this.FrameworkDirPath, MSBuildBinFilename);
 		}
 
 		public string Version { get; private set; }
 
-		public string FrameworkDir { get; private set; }
+		public string FrameworkDirPath { get; private set; }
 
-		public string CSharpCompilerBinFilepath { get; private set; }
+		public string CSharpCompilerBinFilePath { get; private set; }
 
-		public string MSBuildBinFilepath { get; private set; }
+		public string MSBuildBinFilePath { get; private set; }
 		
 		private string GetFrameworkDir(string ver)
 		{
 			if (string.IsNullOrWhiteSpace(ver))
 				throw new ArgumentException("ver is empty or null", "ver");
 
-			var expandedRootDir = Environment.ExpandEnvironmentVariables(RootDir);
+			var expandedRootDir = Environment.ExpandEnvironmentVariables(RootDirPath);
 			var frameworkDir = Path.Combine(expandedRootDir, ver);
 			return frameworkDir;
 		}

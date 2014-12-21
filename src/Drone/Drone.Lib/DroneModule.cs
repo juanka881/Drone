@@ -53,7 +53,7 @@ namespace Drone.Lib
 		/// <value>
 		/// The task count.
 		/// </value>
-		public int TaskCount
+		public int Count
 		{
 			get
 			{
@@ -74,7 +74,7 @@ namespace Drone.Lib
 		/// </summary>
 		/// <param name="name">The name of the task.</param>
 		/// <returns>an option of drone task</returns>
-		public Option<DroneTask> TryGetTask(string name)
+		public Option<DroneTask> TryGet(string name)
 		{
 			return this.tasks.Get(name);
 		}
@@ -111,37 +111,24 @@ namespace Drone.Lib
 			if (module == null)
 				throw new ArgumentNullException("module");
 
+			var hasNamespace = string.IsNullOrWhiteSpace(ns);
+
 			foreach (var task in module.Tasks)
 			{
-				var taskName = task.Name;
+				var newTaskName = task.Name;
+				var newTaskDeps = task.Dependencies;
 
-				if(!string.IsNullOrWhiteSpace(ns))
-					taskName = string.Format("{0}/{1}", ns, task.Name);
-
-				var newTask = task.Clone(taskName);
-
-				var deps = new List<string>(newTask.Dependencies);
-				newTask.Dependencies.Clear();
-
-				foreach (var dep in deps)
+				if(hasNamespace)
 				{
-					var depName = string.Format("{0}/{1}", ns, dep);
-					newTask.Dependencies.Add(depName);
+					newTaskName = string.Format("{0}/{1}", ns, task.Name);
+					newTaskDeps = task.Dependencies.Select(x => string.Format("{0}/{1}", ns, x)).ToList();
 				}
+
+				var newTask = task.Clone(newTaskName);
+				newTask.Dependencies = newTaskDeps;
 
 				this.Add(newTask);
 			}
-		}
-
-		/// <summary>
-		/// Helper function to turn a params list of dependencies
-		/// into a enumerable of strings
-		/// </summary>
-		/// <param name="deps">The deps.</param>
-		/// <returns>the enumerable of strings</returns>
-		protected IEnumerable<string> DependsOn(params string[] deps)
-		{
-			return deps;
 		}
 	}
 }

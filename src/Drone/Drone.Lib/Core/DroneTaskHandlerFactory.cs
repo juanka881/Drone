@@ -21,7 +21,7 @@ namespace Drone.Lib.Core
 
 			if (!this.handlerTypes.HasValue)
 			{
-				this.handlerTypes = Option.From(DroneTaskHandler.GetHanlderTypes());
+				this.handlerTypes = Option.From(DroneTaskHandler.GetHandlerTypes());
 
 				if (!this.handlerTypes.HasValue)
 					throw DroneTaskHandlerNotFoundException.Get(task);

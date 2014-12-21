@@ -22,7 +22,7 @@ namespace Drone.Lib.Helpers
 		private CancellationTokenSource processReadStandardOutputTokenSource;
 		private CancellationTokenSource processReadStandardErrorTokenSource;
 		private CancellationTokenSource processDispatchOutputEventsTokenSource;
-		private ConcurrentQueue<ProcessRunnerOutputReceivedEventArgs> processOutputQueue;
+		private ConcurrentQueue<ProcessRunnerOutputEventArgs> processOutputQueue;
 		
 		private int? exitCode;
 		private DateTime? exitTimestamp;
@@ -43,18 +43,18 @@ namespace Drone.Lib.Helpers
 			this.args = args;
 			this.workDir = workDir;
 			this.redirectStreams = redirectStreams;
-			this.processOutputQueue = new ConcurrentQueue<ProcessRunnerOutputReceivedEventArgs>();
+			this.processOutputQueue = new ConcurrentQueue<ProcessRunnerOutputEventArgs>();
 		}
 
-		public event ProcessRunnerOutputReceivedEventHandler ProcessOutputRecevied;
+		public event ProcessRunnerOutputEventHandler OutputRecevied;
 
-		public event EventHandler ProcessExited;
+		public event EventHandler Exited;
 
-		private void NotifyProcessOutputReceived(ProcessRunnerOutputReceivedEventArgs e)
+		private void NotifyProcessOutputReceived(ProcessRunnerOutputEventArgs e)
 		{
 			this.CheckIsDisposed();
 
-			var handler = this.ProcessOutputRecevied;
+			var handler = this.OutputRecevied;
 
 			if(handler == null)
 				return;
@@ -66,7 +66,7 @@ namespace Drone.Lib.Helpers
 		{
 			this.CheckIsDisposed();
 
-			var handler = this.ProcessExited;
+			var handler = this.Exited;
 
 			if (handler == null)
 				return;
@@ -165,14 +165,12 @@ namespace Drone.Lib.Helpers
 
 					this.processReadStandardOutputTask = new Task(
 						this.ProcessReadStandardOutputTaskCore,
-						this.processReadStandardOutputTokenSource.Token,
 						TaskCreationOptions.LongRunning);
 
 					this.processReadStandardErrorTokenSource = new CancellationTokenSource();
 
 					this.processReadStandardErrorTask = new Task(
 						this.ProcessReadStandardErrorTaskCore,
-						this.processReadStandardErrorTokenSource.Token,
 						TaskCreationOptions.LongRunning);
 
 					this.processDispatchOutputEventsTokenSource = new CancellationTokenSource();
@@ -206,7 +204,7 @@ namespace Drone.Lib.Helpers
 
 			while(!token.IsCancellationRequested)
 			{
-				var e = null as ProcessRunnerOutputReceivedEventArgs;
+				var e = null as ProcessRunnerOutputEventArgs;
 
 				if (this.processOutputQueue.TryDequeue(out e))
 					this.NotifyProcessOutputReceived(e);
@@ -246,7 +244,7 @@ namespace Drone.Lib.Helpers
 					break;
 				
 				var data = stream.ReadLine();
-				this.processOutputQueue.Enqueue(new ProcessRunnerOutputReceivedEventArgs(data, isErrorStream));
+				this.processOutputQueue.Enqueue(new ProcessRunnerOutputEventArgs(data, isErrorStream));
 			}
 		}
 
@@ -329,8 +327,8 @@ namespace Drone.Lib.Helpers
 
 			this.Release();
 
-			this.ProcessOutputRecevied = null;
-			this.ProcessExited = null;
+			this.OutputRecevied = null;
+			this.Exited = null;
 
 			this.isDisposed = true;
 		}

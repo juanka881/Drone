@@ -10,15 +10,17 @@ namespace Drone.Lib.FileSystem
 	{
 		public string FullPath { get; private set; }
 
-		public string FilenameWithExt { get; private set; }
+		public string FileNameWithExt { get; private set; }
 
-		public string FilenameOnly { get; private set; }
+		public string FileName { get; private set; }
 
 		public string FileExt { get; private set; }
 
 		public string FileDir { get; private set; }
 
-		public string OriginalFilename { get; private set; }
+		public bool IsRelative { get; private set; }
+
+		public string OriginalValue { get; private set; }
 
 		public bool Exists
 		{
@@ -28,33 +30,18 @@ namespace Drone.Lib.FileSystem
 			}
 		}
 
-		public FileMetadata(string filename, string rootDir = null)
+		public FileMetadata(string filePath)
 		{
-			this.Set(filename, rootDir);
-		}
+			if(filePath == null)
+				throw new ArgumentNullException("filePath");
 
-		public void Set(string filename, string rootDir = null)
-		{
-			if (string.IsNullOrWhiteSpace(filename))
-				throw new ArgumentException("filename is empty or null", "filename");
-
-			this.OriginalFilename = filename;
-
-			if(!string.IsNullOrWhiteSpace(rootDir) && !Path.IsPathRooted(filename))
-				this.FullPath = Path.GetFullPath(Path.Combine(rootDir, filename));
-			else
-				this.FullPath = Path.GetFullPath(this.OriginalFilename);
-
-			this.FilenameWithExt = Path.GetFileName(this.FullPath);
-			this.FilenameOnly = Path.GetFileNameWithoutExtension(this.FilenameWithExt);
-			this.FileExt = Path.GetExtension(this.FilenameWithExt);
+			this.OriginalValue = filePath;
+			this.IsRelative = !Path.IsPathRooted(filePath);
+			this.FullPath = Path.GetFullPath(filePath);
+			this.FileNameWithExt = Path.GetFileName(filePath);
+			this.FileName = Path.GetFileNameWithoutExtension(filePath);
+			this.FileExt = Path.GetExtension(filePath);
 			this.FileDir = Path.GetDirectoryName(this.FullPath);
-			this.OnSet();
-		}
-
-		protected virtual void OnSet()
-		{
-			
 		}
 	}
 }

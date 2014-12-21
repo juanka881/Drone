@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Drone.Lib.Helpers
 {
-	public static class ListExtensions
+	public static class ListExt
 	{
 		public static void AddRange<T>(this IList<T> list, IEnumerable<T> items)
 		{

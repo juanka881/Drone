@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Drone.Lib.Core;
 using Drone.Lib.Tasks;
 
 namespace Drone.Lib
@@ -9,7 +8,7 @@ namespace Drone.Lib
 	/// <summary>
 	/// Provides extension methods to drone module objects
 	/// </summary>
-	public static class DroneModuleExtensions
+	public static class DroneModuleExt
 	{
 		/// <summary>
 		/// Includes the module into this module without any namespace prefix.

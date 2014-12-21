@@ -128,7 +128,7 @@ namespace Drone.Lib
 			if(string.IsNullOrWhiteSpace(taskName))
 				throw new ArgumentException("taskName is empty or null", "taskName");
 
-			var task = this.Module.TryGetTask(taskName);
+			var task = this.Module.TryGet(taskName);
 
 			if(task.HasValue)
 			{

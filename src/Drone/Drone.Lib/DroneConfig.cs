@@ -11,29 +11,29 @@ namespace Drone.Lib
 {
 	public class DroneConfig
 	{
-		public static readonly string DefaultFilename = "drone.json";
+		public static readonly string DefaultFileName = "drone.json";
 
-		public static readonly string WorkDirname = "drone-workdir";
+		public static readonly string BuildDirName = "drone-builds";
 
-		public static readonly string AssemblyFilename = "drone-user-tasks.dll";
+		public static readonly string AssemblyFileName = "DroneUserTasks.dll";
 
 		[JsonIgnore]
 		public string HashId { get; private set; }
 
 		[JsonIgnore]
-		public string Filepath { get; private set; }
+		public string FilePath { get; private set; }
 
 		[JsonIgnore]
-		public string Filename { get; private set; }
+		public string FileName { get; private set; }
 
 		[JsonIgnore]
-		public string Dirname { get; private set; }
+		public string DirName { get; private set; }
 
 		[JsonIgnore]
-		public string BinDirpath { get; private set; }
+		public string BuildDirPath { get; private set; }
 
 		[JsonIgnore]
-		public string AssemblyFilepath { get; private set; }
+		public string AssemblyFilePath { get; private set; }
 
 		[JsonProperty("source-files")]
 		public IList<string> SourceFiles { get; private set; }
@@ -41,36 +41,27 @@ namespace Drone.Lib
 		[JsonProperty("reference-files")]
 		public IList<string> ReferenceFiles { get; private set; }
 
-		[JsonProperty("properties")]
-		public JObject Properties { get; private set; }
+		[JsonProperty("props")]
+		public JObject Props { get; private set; }
 
 		public DroneConfig()
 		{
 			this.SourceFiles = new List<string>();
 			this.ReferenceFiles = new List<string>();
-			this.Properties = new JObject();
+			this.Props = new JObject();
 		}
 
-		public void SetConfigFilename(string filename)
+		public void SetConfigFilename(string filePath)
 		{
-			if(string.IsNullOrWhiteSpace(filename))
-				throw new ArgumentException("filename is empty or null", "filename");
+			if(filePath == null)
+				throw new ArgumentNullException("filePath");
 
-			if(Path.IsPathRooted(filename))
-			{
-				this.Filename = Path.GetFileName(filename);
-				this.Filepath = filename;
-			}
-			else
-			{
-				this.Filename = filename;
-				this.Filepath = Path.GetFullPath(this.Filename);
-			}
-
-			this.HashId = HashHelper.GetHash(Path.GetFullPath(this.Filepath));
-			this.Dirname = Path.GetDirectoryName(this.Filepath);
-			this.BinDirpath = Path.Combine(Path.GetTempPath(), WorkDirname, this.HashId);
-			this.AssemblyFilepath = Path.Combine(this.BinDirpath, AssemblyFilename);
+			this.FilePath = Path.GetFullPath(filePath);
+			this.FileName = Path.GetFileName(filePath);
+			this.HashId = HashHelper.GetHash(this.FilePath);
+			this.DirName = Path.GetDirectoryName(this.FilePath);
+			this.BuildDirPath = Path.Combine(Path.GetTempPath(), BuildDirName, this.HashId);
+			this.AssemblyFilePath = Path.Combine(this.BuildDirPath, AssemblyFileName);
 		}
 	}
 }

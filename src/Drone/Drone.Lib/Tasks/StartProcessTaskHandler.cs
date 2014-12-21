@@ -9,7 +9,7 @@ namespace Drone.Lib.Tasks
 	{
 		public override void Handle(StartProcessTask task, DroneTaskContext context)
 		{
-			var processRunner = new ProcessRunner(task.Filename, task.Args, task.WorkDir);
+			var processRunner = new ProcessRunner(task.FileName, task.Args, task.WorkDir);
 			processRunner.Start();
 		}
 	}

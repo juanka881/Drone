@@ -88,7 +88,7 @@ namespace Drone.Lib.Core
 				{
 					this.log.Debug("finding task '{0}'", taskName);
 
-					var task = module.TryGetTask(taskName);
+					var task = module.TryGet(taskName);
 
 					if(taskFaulted)
 					{
@@ -200,7 +200,7 @@ namespace Drone.Lib.Core
 		private void EnsureTaskNamesExists(DroneModule module, IList<string> taskNames)
 		{
 			var tasksNotFound = taskNames
-						.Where(x => !module.TryGetTask(x).HasValue)
+						.Where(x => !module.TryGet(x).HasValue)
 						.Distinct()
 						.ToList();
 
@@ -210,7 +210,7 @@ namespace Drone.Lib.Core
 
 		private Option<DroneTaskResult> TryRunDefaultTask(DroneModule module, DroneConfig config, DroneFlags flags)
 		{
-			var task = module.TryGetTask(DroneModule.DefaultTaskName);
+			var task = module.TryGet(DroneModule.DefaultTaskName);
 
 			if(task.HasValue)
 			{

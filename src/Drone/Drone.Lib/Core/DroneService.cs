@@ -9,7 +9,7 @@ namespace Drone.Lib.Core
 {
 	public class DroneService
 	{
-		private readonly DroneConfigStore store;
+		private readonly JsonStore store;
 		private readonly DroneCompiler compiler;
 		private readonly DroneLoader loader;
 		private readonly DroneTaskRunner taskRunner;
@@ -18,7 +18,7 @@ namespace Drone.Lib.Core
 		public DroneService()
 		{
 			this.log = DroneLogManager.GetLog();
-			this.store = new DroneConfigStore();
+			this.store = new JsonStore();
 			this.compiler = new DroneCompiler();
 			this.loader = new DroneLoader();
 			this.taskRunner = new DroneTaskRunner(new DroneTaskHandlerFactory());
@@ -31,14 +31,16 @@ namespace Drone.Lib.Core
 			return module;
 		}
 
-		public DroneConfig LoadConfig(string configFilename)
+		public DroneConfig LoadConfig(string configFilePath)
 		{
-			if(string.IsNullOrWhiteSpace(configFilename))
-				throw new ArgumentException("configFilename is empty or null", "configFilename");
+			if(string.IsNullOrWhiteSpace(configFilePath))
+				throw new ArgumentException("configFilePath is empty or null", "configFilePath");
 
-			using (var fs = File.OpenRead(configFilename))
+			using (var fs = File.OpenRead(configFilePath))
 			{
-				return store.Load(fs, configFilename);
+				var config = this.store.Load<DroneConfig>(fs);
+				config.SetConfigFilename(configFilePath);
+				return config;
 			}
 		}
 
@@ -47,9 +49,9 @@ namespace Drone.Lib.Core
 			if(config == null)
 				throw new ArgumentNullException("config");
 
-			using (var fs = File.Open(config.Filepath, FileMode.Create, FileAccess.Write))
+			using (var fs = File.Open(config.FilePath, FileMode.Create, FileAccess.Write))
 			{
-				store.Save(config, fs);
+				this.store.Save(fs, config);
 			}
 		}
 
@@ -112,7 +114,7 @@ namespace Drone.Lib.Core
 
 		public void RunTasks(DroneConfig config, DroneFlags flags, IEnumerable<string> taskNames)
 		{
-			using(DroneEnvironment.PushScope(config, flags))
+			using(DroneContext.Set(config, flags))
 			{
 				var module = this.CompileAndLoadModule(config, LogLevel.Debug);
 				this.taskRunner.Run(module, taskNames, config, flags);
@@ -121,7 +123,7 @@ namespace Drone.Lib.Core
 
 		public IEnumerable<DroneTask> GetTasks(DroneConfig config, DroneFlags flags, string searchPattern)
 		{
-			using(DroneEnvironment.PushScope(config, flags))
+			using(DroneContext.Set(config, flags))
 			{
 				var module = this.CompileAndLoadModule(config, LogLevel.Debug);
 				

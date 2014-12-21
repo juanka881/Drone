@@ -38,7 +38,7 @@ namespace Drone.Lib.Tasks
 					processRunner.Start();
 
 					
-					processRunner.ProcessOutputRecevied += ProcessRunner_OnProcessOutputRecevied;
+					processRunner.OutputRecevied += ProcessRunner_OnProcessOutputRecevied;
 
 					log.Info("process started, waiting for exit");
 
@@ -72,7 +72,7 @@ namespace Drone.Lib.Tasks
 			}
 		}
 
-		private void ProcessRunner_OnProcessOutputRecevied(object sender, ProcessRunnerOutputReceivedEventArgs e)
+		private void ProcessRunner_OnProcessOutputRecevied(object sender, ProcessRunnerOutputEventArgs e)
 		{
 			if(e.IsError)
 			{

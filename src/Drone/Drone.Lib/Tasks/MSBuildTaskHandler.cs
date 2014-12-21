@@ -33,7 +33,7 @@ namespace Drone.Lib.Tasks
 			foreach(var item in task.Properties)
 				sb.Append("/p:").Append(item.Key).Append("=").Append(item.Value).Append(" ");
 
-			var msbuildCommand = DotNet.DotNetFramework.Version40.MSBuildBinFilepath;
+			var msbuildCommand = DotNet.DotNetFramework.Version40.MSBuildBinFilePath;
 			var msbuildArgs = sb.ToString();
 
 			context.Log.Debug("command line: '{0}'", msbuildCommand);
@@ -45,7 +45,7 @@ namespace Drone.Lib.Tasks
 
 				using(var processRunner = new ProcessRunner(msbuildCommand, msbuildArgs))
 				{
-					processRunner.ProcessOutputRecevied += ProcessRunner_OnProcessOutputRecevied;
+					processRunner.OutputRecevied += ProcessRunner_OnProcessOutputRecevied;
 					processRunner.Start();
 					var result = processRunner.WaitForExit();
 
@@ -65,7 +65,7 @@ namespace Drone.Lib.Tasks
 			}
 		}
 
-		private void ProcessRunner_OnProcessOutputRecevied(object sender, ProcessRunnerOutputReceivedEventArgs e)
+		private void ProcessRunner_OnProcessOutputRecevied(object sender, ProcessRunnerOutputEventArgs e)
 		{
 			if (this.log == null)
 				return;

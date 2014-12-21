@@ -8,7 +8,7 @@ namespace Drone.Lib
 	/// <summary>
 	/// Provides extensions to drone task objects
 	/// </summary>
-	public static class DroneTaskExtensions
+	public static class DroneTaskExt
 	{
 		/// <summary>
 		/// Clones the specified task using a provided 
@@ -28,8 +28,9 @@ namespace Drone.Lib
 				throw new ArgumentException("newName is empty or null", "newName");
 
 			var taskCopy = Activator.CreateInstance(task.GetType()) as DroneTask;
-			typeof(DroneTask).GetProperty("Name").SetValue(taskCopy, newName);
-			taskCopy.Dependencies.AddRange(task.Dependencies);
+
+			taskCopy.Name = newName;
+			taskCopy.Dependencies = task.Dependencies;
 
 			return taskCopy;
 		}

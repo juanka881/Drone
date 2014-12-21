@@ -23,7 +23,7 @@ namespace Drone.Lib
 		/// <value>
 		/// The name.
 		/// </value>
-		public string Name { get; private set; }
+		public string Name { get; internal set; }
 
 		/// <summary>
 		/// Gets the dependencies of the task. dependencies are tasks
@@ -32,7 +32,7 @@ namespace Drone.Lib
 		/// <value>
 		/// The dependencies.
 		/// </value>
-		public IList<string> Dependencies { get; private set; }
+		public IList<string> Dependencies { get; internal set; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DroneTask"/> class.

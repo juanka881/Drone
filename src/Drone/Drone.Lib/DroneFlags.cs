@@ -16,7 +16,7 @@ namespace Drone.Lib
 		/// <value>
 		/// The configuration filename.
 		/// </value>
-		public string ConfigFilename { get; private set; }
+		public string ConfigFileName { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether debug is enabled.
@@ -42,15 +42,24 @@ namespace Drone.Lib
 		/// </value>
 		public LogLevel LogLevel { get; private set; }
 
-		public DroneFlags(string configFilename, bool isDebugEnabled, bool isConsoleLogColorsEnabled, LogLevel logLevel)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DroneFlags"/> class.
+		/// </summary>
+		/// <param name="configFileName">filename of the configuration file.</param>
+		/// <param name="isDebugEnabled">if set to <c>true</c> [is debug enabled].</param>
+		/// <param name="isConsoleLogColorsEnabled">if set to <c>true</c> [is console log colors enabled].</param>
+		/// <param name="logLevel">The log level.</param>
+		/// <exception cref="System.ArgumentException">configFilename is empty or null;configFileName</exception>
+		/// <exception cref="System.ArgumentNullException">logLevel</exception>
+		public DroneFlags(string configFileName, bool isDebugEnabled, bool isConsoleLogColorsEnabled, LogLevel logLevel)
 		{
-			if(string.IsNullOrWhiteSpace(configFilename))
-				throw new ArgumentException("configFilename is empty or null", "configFilename");
+			if(string.IsNullOrWhiteSpace(configFileName))
+				throw new ArgumentException("configFilename is empty or null", "configFileName");
 
 			if(logLevel == null)
 				throw new ArgumentNullException("logLevel");
 
-			this.ConfigFilename = configFilename;
+			this.ConfigFileName = configFileName;
 			this.IsDebugEnabled = isDebugEnabled;
 			this.IsConsoleLogColorsEnabled = isConsoleLogColorsEnabled;
 			this.LogLevel = logLevel;

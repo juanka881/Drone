@@ -6,7 +6,7 @@ namespace Drone.Lib.Tasks
 {
 	public class StartProcessTask : DroneTask
 	{
-		public string Filename { get; set; }
+		public string FileName { get; set; }
 
 		public string Args { get; set; }
 
@@ -16,7 +16,7 @@ namespace Drone.Lib.Tasks
 		{
 			return this.Clone(newName, x =>
 			{
-				x.Filename = this.Filename;
+				x.FileName = this.FileName;
 				x.Args = this.Args;
 				x.WorkDir = this.WorkDir;
 			});
