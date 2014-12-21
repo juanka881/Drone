@@ -42,7 +42,7 @@ namespace Drone.App
 
 		private DroneFlags GetFlags(ParameterTokenSet tokens)
 		{
-			var configFilename = tokens.PopFlagValue("-f", DroneConfig.DefaultFileName);
+			var configFilename = tokens.PopFlagValue("-f", DroneConfig.DroneFileName);
 			var isDebugEnabled = tokens.PopFlag("-d");
 			var isConsoleLogColorsEnabled = !tokens.PopFlag("-no-colors");
 			var logLevel = DroneLogManager.GetLogLevelFromString(tokens.PopFlagValue("-l", "info"));
@@ -482,9 +482,12 @@ namespace Drone.App
 			var config = new DroneConfig();
 			config.SetConfigFilename(flags.ConfigFileName);
 
+			this.droneService.InitDroneDir(config);
+
 			this.droneService.SaveConfig(config);
 
-			this.log.Info("created '{0}'", flags.ConfigFileName);
+			this.log.Info("created '{0}'", Path.GetFileName(config.DroneDirPath));
+			this.log.Info("created '{0}'", Path.GetFileName(config.FilePath));
 		}
 
 		public void Run(string commandLine)

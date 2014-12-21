@@ -25,7 +25,7 @@ namespace Drone.Lib.Core
 			this.store = new JsonStore();
 		}
 
-		public bool NeedsRecompile(DroneConfig config)
+		public bool IsRecompileNeeded(DroneConfig config)
 		{
 			this.EnsureBuildDirExits(config);
 
@@ -37,6 +37,15 @@ namespace Drone.Lib.Core
 
 			var cache = this.store.Load<FileMetadataCache>(this.GetCacheFileName(config));
 			return cache.HasChanges();
+		}
+
+		public IEnumerable<string> GetBaseReferenceFiles()
+		{
+			var appPath = this.GetAppPathBaseDir();
+
+			yield return Path.Combine(appPath, "Drone.Lib.dll");
+			yield return Path.Combine(appPath, "Nlog.dll");
+			yield return Path.Combine(appPath, "Newtonsoft.Json.dll");
 		}
 
 		private void EnsureBuildDirExits(DroneConfig config)
@@ -68,16 +77,7 @@ namespace Drone.Lib.Core
 			this.store.Save(this.GetCacheFileName(config), cache);
 		}
 
-		private IEnumerable<string> GetBaseReferenceFiles()
-		{
-			var appPath = this.GetDroneAppPath();
-			
-			yield return Path.Combine(appPath, "Drone.Lib.dll");
-			yield return Path.Combine(appPath, "Nlog.dll");
-			yield return Path.Combine(appPath, "Newtonsoft.Json.dll");
-		}
-
-		private string GetDroneAppPath()
+		private string GetAppPathBaseDir()
 		{
 			var codeBase = System.Reflection.Assembly.GetEntryAssembly().CodeBase;
 			var uri = new UriBuilder(codeBase);
@@ -114,7 +114,7 @@ namespace Drone.Lib.Core
 				this.log.Debug("creating csharp compiler args");
 
 				var args = new CSharpCompilerArgs(
-					config.DirName,
+					config.DirPath,
 					config.AssemblyFilePath,
 					sourceFiles,
 					referenceFiles);
@@ -171,20 +171,20 @@ namespace Drone.Lib.Core
 			}
 		}
 
-		private IEnumerable<string> ResolveSourceFiles(IList<string> files, string configDirpath)
+		private IEnumerable<string> ResolveSourceFiles(IList<string> files, string configDirPath)
 		{
 			foreach(var file in files)
 			{
 				var fullpath = file;
 
 				if(!Path.IsPathRooted(file))
-					fullpath = Path.Combine(configDirpath, file);
+					fullpath = Path.Combine(configDirPath, file);
 
 				yield return fullpath;
 			}
 		}
 
-		private IEnumerable<string> ResolveReferenceFiles(IEnumerable<string> files, string configDirpath)
+		private IEnumerable<string> ResolveReferenceFiles(IEnumerable<string> files, string configDirPath)
 		{
 			var sb = new StringBuilder();
 
@@ -195,7 +195,7 @@ namespace Drone.Lib.Core
 				var fullPath = file;
 
 				if(!Path.IsPathRooted(fullPath))
-					fullPath = Path.Combine(configDirpath, file);
+					fullPath = Path.Combine(configDirPath, file);
 
 				if(Regex.IsMatch(fullPath, @"\%.+\%"))
 				{
@@ -212,7 +212,7 @@ namespace Drone.Lib.Core
 
 		public void Compile(DroneConfig config, LogLevel logLevel)
 		{
-			if (this.NeedsRecompile(config))
+			if (this.IsRecompileNeeded(config))
 			{
 				var result = this.CompileCore(config);
 				

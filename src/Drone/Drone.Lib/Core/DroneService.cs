@@ -139,5 +139,27 @@ namespace Drone.Lib.Core
 		{
 			this.compiler.Compile(config, logLevel);
 		}
+
+		public void InitDroneDir(DroneConfig config)
+		{
+			if(config == null)
+				throw new ArgumentNullException("config");
+
+			if(Directory.Exists(config.DroneDirPath))
+				return;
+
+			Directory.CreateDirectory(config.DroneDirPath);
+
+			if(!Directory.Exists(config.DroneReferencesDirPath))
+				Directory.CreateDirectory(config.DroneReferencesDirPath);
+
+			var referenceFiles = this.compiler.GetBaseReferenceFiles();
+
+			foreach(var referenceFile in referenceFiles)
+			{
+				var destFile = Path.Combine(config.DroneReferencesDirPath, Path.GetFileName(referenceFile));
+				File.Copy(referenceFile, destFile);
+			}
+		}
 	}
 }

@@ -11,9 +11,11 @@ namespace Drone.Lib
 {
 	public class DroneConfig
 	{
-		public static readonly string DefaultFileName = "drone.json";
+		public static readonly string DroneFileName = "drone.json";
 
-		public static readonly string BuildDirName = "drone-builds";
+		public static readonly string DroneDirName = ".drone";
+
+		public static readonly string DroneReferencesDirName = "refs";
 
 		public static readonly string AssemblyFileName = "DroneUserTasks.dll";
 
@@ -27,10 +29,16 @@ namespace Drone.Lib
 		public string FileName { get; private set; }
 
 		[JsonIgnore]
-		public string DirName { get; private set; }
+		public string DirPath { get; private set; }
 
 		[JsonIgnore]
 		public string BuildDirPath { get; private set; }
+
+		[JsonIgnore]
+		public string DroneDirPath { get; private set; }
+
+		[JsonIgnore]
+		public string DroneReferencesDirPath { get; private set; }
 
 		[JsonIgnore]
 		public string AssemblyFilePath { get; private set; }
@@ -59,8 +67,10 @@ namespace Drone.Lib
 			this.FilePath = Path.GetFullPath(filePath);
 			this.FileName = Path.GetFileName(filePath);
 			this.HashId = HashHelper.GetHash(this.FilePath);
-			this.DirName = Path.GetDirectoryName(this.FilePath);
-			this.BuildDirPath = Path.Combine(Path.GetTempPath(), BuildDirName, this.HashId);
+			this.DirPath = Path.GetDirectoryName(this.FilePath);
+			this.DroneDirPath = Path.Combine(this.DirPath, DroneDirName);
+			this.DroneReferencesDirPath = Path.Combine(this.DroneDirPath, DroneReferencesDirName);
+			this.BuildDirPath = Path.Combine(this.DroneDirPath, this.HashId.Substring(0, 8));
 			this.AssemblyFilePath = Path.Combine(this.BuildDirPath, AssemblyFileName);
 		}
 	}
