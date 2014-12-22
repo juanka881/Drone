@@ -50,10 +50,10 @@ namespace Drone.Lib
 		[JsonIgnore]
 		public string AssemblyFilePath { get; private set; }
 
-		[JsonProperty("source-files")]
+		[JsonProperty("src")]
 		public IList<string> SourceFiles { get; private set; }
 
-		[JsonProperty("reference-files")]
+		[JsonProperty("refs")]
 		public IList<string> ReferenceFiles { get; private set; }
 
 		[JsonProperty("props")]
