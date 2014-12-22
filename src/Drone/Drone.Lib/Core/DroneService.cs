@@ -24,11 +24,49 @@ namespace Drone.Lib.Core
 			this.taskRunner = new DroneTaskRunner(new DroneTaskHandlerFactory());
 		}
 
-		private DroneModule CompileAndLoadModule(DroneConfig config, LogLevel logLevel)
+		private DroneModule CompileAndLoadModule(DroneEnv env, LogLevel logLevel)
 		{
-			this.compiler.Compile(config, logLevel);
-			var module = this.loader.Load(config);
+			this.compiler.Compile(env, logLevel);
+			var module = this.loader.Load(env.Config);
 			return module;
+		}
+
+		private IList<string> GetFixedFilePaths(string basePath, IEnumerable<string> files)
+		{
+			var relPaths = from filePath in files
+						   let absPath = Path.IsPathRooted(filePath) ? filePath : Path.Combine(basePath, filePath)
+						   select absPath;
+
+			return relPaths.ToList();
+		}
+
+		private bool EnsureFilesExists(string basePath, IEnumerable<string> files)
+		{
+			var notFound = false;
+
+			foreach (var file in files)
+			{
+				var filename = file;
+
+				if(!Path.IsPathRooted(filename))
+					filename = Path.Combine(basePath, file);
+
+					if (!File.Exists(filename))
+					{
+						notFound = true;
+						this.log.Error("file not found: {0}", file);
+					}
+			}
+
+			return notFound;
+		}
+
+		public string GetAppPathBaseDir()
+		{
+			var codeBase = System.Reflection.Assembly.GetEntryAssembly().CodeBase;
+			var uri = new UriBuilder(codeBase);
+			var path = Uri.UnescapeDataString(uri.Path);
+			return Path.GetDirectoryName(path);
 		}
 
 		public DroneConfig LoadConfig(string configFilePath)
@@ -49,10 +87,7 @@ namespace Drone.Lib.Core
 			if(config == null)
 				throw new ArgumentNullException("config");
 
-			using (var fs = File.Open(config.FilePath, FileMode.Create, FileAccess.Write))
-			{
-				this.store.Save(fs, config);
-			}
+			this.store.Save(config.FilePath, config);
 		}
 
 		public void AddFiles(DroneConfig config, IList<string> sourceFiles, IList<string> referenceFiles)
@@ -75,6 +110,11 @@ namespace Drone.Lib.Core
 				this.log.Warn("no files added. files already exists in config");
 				return;
 			}
+
+			var fileNotFound = this.EnsureFilesExists(config.DirPath, sourcesToAdd.Concat(referencesToAdd));
+
+			if (fileNotFound)
+				return;
 
 			config.SourceFiles.AddRange(sourcesToAdd);
 			config.ReferenceFiles.AddRange(referencesToAdd);
@@ -104,7 +144,7 @@ namespace Drone.Lib.Core
 
 			if (sourcesRemoved.Count == 0 && referencesRemoved.Count == 0)
 			{
-				this.log.Warn("nothing to remove. files dont exists in config");
+				this.log.Warn("nothing to remove. files do not exist in config");
 				return;
 			}
 
@@ -112,32 +152,29 @@ namespace Drone.Lib.Core
 				this.log.Info("removed '{0}'", file);
 		}
 
-		public void RunTasks(DroneConfig config, DroneFlags flags, IEnumerable<string> taskNames)
+		public void RunTasks(DroneEnv env, IEnumerable<string> taskNames)
 		{
-			using(DroneContext.Set(config, flags))
-			{
-				var module = this.CompileAndLoadModule(config, LogLevel.Debug);
-				this.taskRunner.Run(module, taskNames, config, flags);
-			}
+			DroneEnv.Set(env);
+			var module = this.CompileAndLoadModule(env, LogLevel.Debug);
+			this.taskRunner.Run(module, taskNames, env);
 		}
 
-		public IEnumerable<DroneTask> GetTasks(DroneConfig config, DroneFlags flags, string searchPattern)
+		public IEnumerable<DroneTask> GetTasks(DroneEnv env)
 		{
-			using(DroneContext.Set(config, flags))
-			{
-				var module = this.CompileAndLoadModule(config, LogLevel.Debug);
+			DroneEnv.Set(env);
+			var module = this.CompileAndLoadModule(env, LogLevel.Debug);
 				
-				foreach (var task in module.Tasks)
-				{
-					var taskCopy = new DroneTask(task.Name, task.Dependencies);
-					yield return taskCopy;
-				}
+			foreach (var task in module.Tasks)
+			{
+				var taskCopy = new DroneTask(task.Name, task.Dependencies);
+				yield return taskCopy;
 			}
 		}
 
-		public void CompileTasks(DroneConfig config, LogLevel logLevel)
+		public void CompileTasks(DroneEnv env, LogLevel logLevel)
 		{
-			this.compiler.Compile(config, logLevel);
+			DroneEnv.Set(env);
+			this.compiler.Compile(env, logLevel);
 		}
 
 		public void InitDroneDir(DroneConfig config)
@@ -150,10 +187,13 @@ namespace Drone.Lib.Core
 
 			Directory.CreateDirectory(config.DroneDirPath);
 
+			if(!Directory.Exists(config.DroneSourceDirPath))
+				Directory.CreateDirectory(config.DroneSourceDirPath);
+
 			if(!Directory.Exists(config.DroneReferencesDirPath))
 				Directory.CreateDirectory(config.DroneReferencesDirPath);
 
-			var referenceFiles = this.compiler.GetBaseReferenceFiles();
+			var referenceFiles = this.compiler.GetBaseReferenceFiles(this.GetAppPathBaseDir());
 
 			foreach(var referenceFile in referenceFiles)
 			{

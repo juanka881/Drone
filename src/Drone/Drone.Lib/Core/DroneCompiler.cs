@@ -39,13 +39,11 @@ namespace Drone.Lib.Core
 			return cache.HasChanges();
 		}
 
-		public IEnumerable<string> GetBaseReferenceFiles()
+		public IEnumerable<string> GetBaseReferenceFiles(string basePath)
 		{
-			var appPath = this.GetAppPathBaseDir();
-
-			yield return Path.Combine(appPath, "Drone.Lib.dll");
-			yield return Path.Combine(appPath, "Nlog.dll");
-			yield return Path.Combine(appPath, "Newtonsoft.Json.dll");
+			yield return Path.Combine(basePath, "Drone.Lib.dll");
+			yield return Path.Combine(basePath, "Nlog.dll");
+			yield return Path.Combine(basePath, "Newtonsoft.Json.dll");
 		}
 
 		private void EnsureBuildDirExits(DroneConfig config)
@@ -68,58 +66,50 @@ namespace Drone.Lib.Core
 
 			cache.Add(new FileInfo(config.FilePath));
 
-			foreach(var source in config.SourceFiles)
+			foreach(var source in this.ResolveSourceFiles(config.SourceFiles, config.DirPath))
 				cache.Add(new FileInfo(source));
 
-			foreach(var reference in config.ReferenceFiles)
+			foreach(var reference in this.ResolveReferenceFiles(config.ReferenceFiles, config.DirPath))
 				cache.Add(new FileInfo(reference));
 
 			this.store.Save(this.GetCacheFileName(config), cache);
 		}
 
-		private string GetAppPathBaseDir()
-		{
-			var codeBase = System.Reflection.Assembly.GetEntryAssembly().CodeBase;
-			var uri = new UriBuilder(codeBase);
-			var path = Uri.UnescapeDataString(uri.Path);
-			return Path.GetDirectoryName(path);
-		}
-
-		private CSharpCompilerResult CompileCore(DroneConfig config)
+		private CSharpCompilerResult CompileCore(DroneEnv env)
 		{
 			try
 			{
-				if (config == null)
-					throw new ArgumentNullException("config");
+				if (env == null)
+					throw new ArgumentNullException("env");
 
 				var compiler = new CSharpCompiler();
 
-				this.log.Debug("checking if output dir exists '{0}'", config.BuildDirPath);
+				this.log.Debug("checking if output dir exists '{0}'", env.Config.BuildDirPath);
 
-				if (!Directory.Exists(config.BuildDirPath))
+				if (!Directory.Exists(env.Config.BuildDirPath))
 				{
 					this.log.Debug("output dir not found. creating output bin dir");
-					Directory.CreateDirectory(config.BuildDirPath);
+					Directory.CreateDirectory(env.Config.BuildDirPath);
 				}
 
-				var configDirpath = Path.GetDirectoryName(config.FilePath);
+				var configDirpath = Path.GetDirectoryName(env.Config.FilePath);
 
-				var resolvedBaseReferences = this.GetBaseReferenceFiles();
-				var resolvedConfigReferences = this.ResolveReferenceFiles(config.ReferenceFiles, configDirpath);
+				var resolvedBaseReferences = this.GetBaseReferenceFiles(env.Config.DroneReferencesDirPath);
+				var resolvedConfigReferences = this.ResolveReferenceFiles(env.Config.ReferenceFiles, configDirpath);
 
 				var referenceFiles = resolvedBaseReferences.Concat(resolvedConfigReferences).Distinct().ToList();
 
-				var sourceFiles = this.ResolveSourceFiles(config.SourceFiles, configDirpath).ToList();
+				var sourceFiles = this.ResolveSourceFiles(env.Config.SourceFiles, configDirpath).ToList();
 
 				this.log.Debug("creating csharp compiler args");
 
 				var args = new CSharpCompilerArgs(
-					config.DirPath,
-					config.AssemblyFilePath,
+					env.Config.DirPath,
+					env.Config.AssemblyFilePath,
 					sourceFiles,
 					referenceFiles);
 
-				if (DroneContext.Flags != null && DroneContext.Flags.IsDebugEnabled)
+				if (env.Flags.IsDebugEnabled)
 				{
 					args.Debug = true;
 					args.Optimize = false;
@@ -146,7 +136,7 @@ namespace Drone.Lib.Core
 						this.log.Debug(file);
 				}
 
-				this.log.Debug("calling csc compiler '{0}'...", config.FileName);
+				this.log.Debug("calling csc compiler '{0}'...", env.Config.FileName);
 
 				var result = compiler.Compile(args);
 
@@ -210,17 +200,17 @@ namespace Drone.Lib.Core
 			}
 		}
 
-		public void Compile(DroneConfig config, LogLevel logLevel)
+		public void Compile(DroneEnv env, LogLevel logLevel)
 		{
-			if (this.IsRecompileNeeded(config))
+			if (this.IsRecompileNeeded(env.Config))
 			{
-				var result = this.CompileCore(config);
+				var result = this.CompileCore(env);
 				
 				try
 				{
 					if (result.IsSuccess)
 					{
-						this.CreateCache(config);
+						this.CreateCache(env.Config);
 						this.log.Log(logLevel, "compiled ({0})", HumanTime.Format(result.TimeElapsed));
 					}
 					else

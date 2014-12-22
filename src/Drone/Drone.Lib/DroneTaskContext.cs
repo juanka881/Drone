@@ -6,22 +6,23 @@ using NLog;
 
 namespace Drone.Lib
 {
+	public delegate void DroneTaskRunner(DroneTask task, DroneEnv env);
+
 	/// <summary>
 	/// Represents the context in which a drone task is being executed.
 	/// </summary>
 	public class DroneTaskContext
 	{
-		private readonly Action<DroneTask, DroneConfig, DroneFlags> runTask;
-
+		private readonly DroneTaskRunner taskRunner;
+		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DroneTaskContext" /> class.
 		/// </summary>
 		/// <param name="module">The module from where the task came from.</param>
 		/// <param name="task">The task being executed.</param>
-		/// <param name="config">The configuration loaded by the drone app.</param>
-		/// <param name="flags">The flags.</param>
+		/// <param name="env">The env.</param>
 		/// <param name="log">The task log.</param>
-		/// <param name="runTask">The run task function use to run other tasks.</param>
+		/// <param name="taskRunner">The run task function use to run other tasks.</param>
 		/// <exception cref="System.ArgumentNullException">module
 		/// or
 		/// task
@@ -34,10 +35,9 @@ namespace Drone.Lib
 		public DroneTaskContext(
 			DroneModule module,
 			DroneTask task, 
-			DroneConfig config, 
-			DroneFlags flags,
+			DroneEnv env,
 			Logger log, 
-			Action<DroneTask, DroneConfig, DroneFlags> runTask)
+			DroneTaskRunner taskRunner)
 		{
 			if(module == null)
 				throw new ArgumentNullException("module");
@@ -45,24 +45,20 @@ namespace Drone.Lib
 			if(task == null)
 				throw new ArgumentNullException("task");
 
-			if(config == null)
-				throw new ArgumentNullException("config");
-
-			if(flags == null)
-				throw new ArgumentNullException("flags");
+			if(env == null)
+				throw new ArgumentNullException("env");
 
 			if(log == null)
 				throw new ArgumentNullException("log");
 
-			if(runTask == null)
-				throw new ArgumentNullException("runTask");
+			if(taskRunner == null)
+				throw new ArgumentNullException("taskRunner");
 
 			this.Module = module;
 			this.Task = task;
-			this.Config = config;
-			this.Flags = flags;
+			this.Env = env;
 			this.Log = log;
-			this.runTask = runTask;
+			this.taskRunner = taskRunner;
 		}
 
 		/// <summary>
@@ -82,20 +78,12 @@ namespace Drone.Lib
 		public DroneTask Task { get; private set; }
 
 		/// <summary>
-		/// Gets the drone app configuration.
+		/// Gets the environment for the current task.
 		/// </summary>
 		/// <value>
-		/// The configuration.
+		/// The env.
 		/// </value>
-		public DroneConfig Config { get; private set; }
-
-		/// <summary>
-		/// Gets the drone app flags.
-		/// </summary>
-		/// <value>
-		/// The flags.
-		/// </value>
-		public DroneFlags Flags { get; private set; }
+		public DroneEnv Env { get; private set; }
 
 		/// <summary>
 		/// Gets the task log 
@@ -115,7 +103,7 @@ namespace Drone.Lib
 			if (task == null)
 				throw new ArgumentNullException("task");
 
-			this.runTask(task, this.Config, this.Flags);
+			this.taskRunner(task, this.Env);
 		}
 
 		/// <summary>

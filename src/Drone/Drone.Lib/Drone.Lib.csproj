@@ -51,13 +51,12 @@
     <Compile Include="Core\DroneService.cs" />
     <Compile Include="Core\InvalidLogLevelStringException.cs" />
     <Compile Include="Helpers\JsonStore.cs" />
-    <Compile Include="DroneContextScope.cs" />
     <Compile Include="FileSystem\FileMetadataCacheItem.cs" />
     <Compile Include="Helpers\JsonStoreExt.cs" />
     <Compile Include="Tasks\ActionTaskHandler.cs" />
     <Compile Include="Core\DroneCreateMainModuleFailedException.cs" />
     <Compile Include="Tasks\AliasTaskHandler.cs" />
-    <Compile Include="DroneContext.cs" />
+    <Compile Include="DroneEnv.cs" />
     <Compile Include="DroneFlags.cs" />
     <Compile Include="DroneTaskExt.cs" />
     <Compile Include="DroneTaskHandler.cs" />

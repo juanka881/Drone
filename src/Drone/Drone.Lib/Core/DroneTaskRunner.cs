@@ -36,15 +36,14 @@ namespace Drone.Lib.Core
 		/// </summary>
 		/// <param name="module">The module.</param>
 		/// <param name="taskNames">The task names.</param>
-		/// <param name="config">The configuration to use when executing the tasks.</param>
-		/// <param name="flags">The flags.</param>
+		/// <param name="env">The env.</param>
 		/// <returns></returns>
 		/// <exception cref="System.ArgumentNullException">module
 		/// or
 		/// taskNames
 		/// or
 		/// config</exception>
-		public IList<DroneTaskResult> Run(DroneModule module, IEnumerable<string> taskNames, DroneConfig config, DroneFlags flags)
+		public IList<DroneTaskResult> Run(DroneModule module, IEnumerable<string> taskNames, DroneEnv env)
 		{
 			if (module == null)
 				throw new ArgumentNullException("module");
@@ -52,11 +51,8 @@ namespace Drone.Lib.Core
 			if (taskNames == null)
 				throw new ArgumentNullException("taskNames");
 
-			if(config == null)
-				throw new ArgumentNullException("config");
-
-			if(flags == null)
-				throw new ArgumentNullException("flags");
+			if(env == null)
+				throw new ArgumentNullException("env");
 
 			var names = taskNames.ToList();
 			var results = new List<DroneTaskResult>();
@@ -67,7 +63,7 @@ namespace Drone.Lib.Core
 			{
 				this.log.Debug("no task names provided, trying to run default task");
 
-				var result = this.TryRunDefaultTask(module, config, flags);
+				var result = this.TryRunDefaultTask(module, env);
 
 				if(result.HasValue)
 					results.Add(result.Value);
@@ -99,7 +95,7 @@ namespace Drone.Lib.Core
 
 					this.log.Debug("task '{0}' found!, running...", taskName);
 
-					var result = this.Run(module, task.Value, config, flags, true);
+					var result = this.Run(module, task.Value, env, true);
 
 					results.Add(result);
 
@@ -208,14 +204,14 @@ namespace Drone.Lib.Core
 				throw DroneTasksNotFoundException.Get(tasksNotFound);
 		}
 
-		private Option<DroneTaskResult> TryRunDefaultTask(DroneModule module, DroneConfig config, DroneFlags flags)
+		private Option<DroneTaskResult> TryRunDefaultTask(DroneModule module, DroneEnv env)
 		{
 			var task = module.TryGet(DroneModule.DefaultTaskName);
 
 			if(task.HasValue)
 			{
 				this.log.Debug("default task found, running...");
-				return Option.From(this.Run(module, task.Value, config, flags, true));
+				return Option.From(this.Run(module, task.Value, env, true));
 			}
 			else
 			{
@@ -224,13 +220,13 @@ namespace Drone.Lib.Core
 			}
 		}
 
-		private DroneTaskResult Run(DroneModule module, DroneTask task, DroneConfig config, DroneFlags flags, bool logErrors)
+		private DroneTaskResult Run(DroneModule module, DroneTask task, DroneEnv env, bool logErrors)
 		{
 			var taskLog = DroneLogManager.GetTaskLog(task.Name);
 
-			var taskContext = new DroneTaskContext(module, task, config, flags, taskLog, (t, c, f) =>
+			var taskContext = new DroneTaskContext(module, task, env, taskLog, (t, e) =>
 			{
-				var childTaskResult = this.Run(module, t, c, f, false);
+				var childTaskResult = this.Run(module, t, e, false);
 
 				if(!childTaskResult.IsSuccess)
 				{

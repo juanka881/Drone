@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Drone.App
 {
@@ -43,6 +44,13 @@ namespace Drone.App
 		private DroneFlags GetFlags(ParameterTokenSet tokens)
 		{
 			var configFilename = tokens.PopFlagValue("-f", DroneConfig.DroneFileName);
+
+			if (Directory.Exists(configFilename))
+			{
+				this.log.Debug("config filename is a directory, setting config filename to dir + default name");
+				configFilename = Path.Combine(configFilename, DroneConfig.DroneFileName);
+			}
+
 			var isDebugEnabled = tokens.PopFlag("-d");
 			var isConsoleLogColorsEnabled = !tokens.PopFlag("-no-colors");
 			var logLevel = DroneLogManager.GetLogLevelFromString(tokens.PopFlagValue("-l", "info"));
@@ -291,6 +299,7 @@ namespace Drone.App
 			}
 			else
 			{
+				
 				action(tokens, flags);
 			}
 		}
@@ -303,15 +312,25 @@ namespace Drone.App
 		private void CompileCommand(ParameterTokenSet tokens, DroneFlags flags)
 		{
 			var config = this.droneService.LoadConfig(flags.ConfigFileName);
-			this.droneService.CompileTasks(config, LogLevel.Info);
+			var env = new DroneEnv(config, flags);
+			this.droneService.CompileTasks(env, LogLevel.Info);
 		}
 
 		private void ListCommand(ParameterTokenSet tokens, DroneFlags flags)
 		{
 			var config = this.droneService.LoadConfig(flags.ConfigFileName);
+			var env = new DroneEnv(config, flags);
 
 			// need to add pattern matching to the check
-			var tasks = this.droneService.GetTasks(config, flags, string.Empty).ToList(); 
+			var tasks = this.droneService.GetTasks(env).ToList();
+
+			var searchPatternFlag = tokens.Pop();
+
+			if(searchPatternFlag != null)
+			{
+				var searchPattern = searchPatternFlag.Value ?? string.Empty;
+				tasks = tasks.Where(x => Regex.IsMatch(x.Name, searchPattern)).ToList();
+			}
 			
 			var taskCounter = 0;
 
@@ -410,8 +429,9 @@ namespace Drone.App
 		private void RunCommand(ParameterTokenSet tokens, DroneFlags flags)
 		{
 			var config = this.droneService.LoadConfig(flags.ConfigFileName);
+			var env = new DroneEnv(config, flags);
 			var taskNames = tokens.Where(x => !x.Value.StartsWith("-")).Select(x => x.Value);
-			this.droneService.RunTasks(config, flags, taskNames);
+			this.droneService.RunTasks(env, taskNames);
 		}
 
 		private void RemoveCommand(ParameterTokenSet tokens, DroneFlags flags)

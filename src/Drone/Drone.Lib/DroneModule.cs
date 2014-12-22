@@ -29,7 +29,7 @@ namespace Drone.Lib
 		/// when locating task to execute. Having more than 1 main module will 
 		/// cause an error. 
 		/// </summary>
-		public static readonly string MainModuleName = "main";
+		public static readonly string MainModuleName = "MainModule";
 
 		private readonly IDictionary<string, DroneTask> tasks;
 

@@ -39,7 +39,7 @@ namespace Drone.Lib.Core
 
 			var moduleTypes = (from type in assembly.GetTypes()
 							   where typeof(DroneModule).IsAssignableFrom(type) &&
-									 type.Name.ToLower() == DroneModule.MainModuleName
+									 type.Name.ToLower() == DroneModule.MainModuleName.ToLower()
 							   select type).ToList();
 
 			if (moduleTypes.Count > 0)
