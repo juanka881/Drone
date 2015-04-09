@@ -52,7 +52,7 @@ namespace Drone.Lib.Tasks
 					if (this.hasError)
 						throw new Exception("msbuild failed");
 
-					if (result.ExitCode != 0)
+					if (result.ExitCode > 0)
 					{
 						var ex = new Exception("msbuild failed: exited with a non-zero exit code");
 						ex.Data["exit-code"] = result.ExitCode;
@@ -90,6 +90,7 @@ namespace Drone.Lib.Tasks
 
 					case MSBuildOutputLevel.Error:
 						this.log.Error(e.Data);
+						this.hasError = true;
 						break;
 
 					case MSBuildOutputLevel.Warning:
