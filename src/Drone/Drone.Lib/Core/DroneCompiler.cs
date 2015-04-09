@@ -94,8 +94,8 @@ namespace Drone.Lib.Core
 
 				var configDirpath = Path.GetDirectoryName(env.Config.FilePath);
 
-				var resolvedBaseReferences = this.GetBaseReferenceFiles(env.Config.DroneReferencesDirPath);
-				var resolvedConfigReferences = this.ResolveReferenceFiles(env.Config.ReferenceFiles, configDirpath);
+				var resolvedBaseReferences = this.GetBaseReferenceFiles(env.Config.DroneReferencesDirPath).ToList();
+				var resolvedConfigReferences = this.ResolveReferenceFiles(env.Config.ReferenceFiles, configDirpath).ToList();
 
 				var referenceFiles = resolvedBaseReferences.Concat(resolvedConfigReferences).Distinct().ToList();
 
@@ -146,6 +146,11 @@ namespace Drone.Lib.Core
 				if (result.IsSuccess)
 				{
 					this.log.Debug("output assembly filepath: '{0}'", result.Success.OutputAssemblyFilepath);
+
+					var outputPath = Path.GetDirectoryName(result.Success.OutputAssemblyFilepath);
+
+					foreach (var refFile in resolvedConfigReferences)
+						File.Copy(refFile, Path.Combine(outputPath, Path.GetFileName(refFile)), true);
 				}
 
 				return result;

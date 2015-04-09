@@ -24,14 +24,16 @@ namespace Drone.Lib
 			if(task == null)
 				throw new ArgumentNullException("task");
 
+			if(fn == null)
+				throw new ArgumentNullException("fn");
+
 			if(string.IsNullOrWhiteSpace(newName))
 				throw new ArgumentException("newName is empty or null", "newName");
 
-			var taskCopy = Activator.CreateInstance(task.GetType()) as DroneTask;
-
+			var taskCopy = Activator.CreateInstance<T>();
 			taskCopy.Name = newName;
 			taskCopy.Dependencies = task.Dependencies;
-
+			fn(taskCopy);
 			return taskCopy;
 		}
 	}

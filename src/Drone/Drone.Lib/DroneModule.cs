@@ -111,7 +111,7 @@ namespace Drone.Lib
 			if (module == null)
 				throw new ArgumentNullException("module");
 
-			var hasNamespace = string.IsNullOrWhiteSpace(ns);
+			var hasNamespace = !string.IsNullOrWhiteSpace(ns);
 
 			foreach (var task in module.Tasks)
 			{
